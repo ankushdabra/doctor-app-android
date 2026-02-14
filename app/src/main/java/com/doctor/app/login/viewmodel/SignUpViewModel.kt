@@ -24,8 +24,9 @@ class SignUpViewModel(
         viewModelScope.launch {
             _state.value = UiState.Loading
             repository.registerDoctor(doctorRequest)
-                .onSuccess { token ->
-                    tokenManager.saveToken(token)
+                .onSuccess { response ->
+                    tokenManager.saveToken(response.token)
+                    tokenManager.saveUserDetails(response.user)
                     _state.value = UiState.Success(true)
                 }
                 .onFailure { exception ->

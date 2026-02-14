@@ -16,4 +16,13 @@ class AppointmentRepository(tokenManager: TokenManager) {
             Result.failure(e)
         }
     }
+
+    suspend fun getTodaysAppointments(): Result<List<AppointmentDto>> {
+        return try {
+            val response = api.getTodaysAppointments()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

@@ -12,8 +12,3 @@ data class DoctorSignUpRequestDto(
     val clinicAddress: String,
     val availability: Map<String, List<TimeSlotDto>> = emptyMap()
 )
-
-data class TimeSlotDto(
-    val startTime: String,
-    val endTime: String
-)

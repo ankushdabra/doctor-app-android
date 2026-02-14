@@ -1,6 +1,7 @@
 package com.doctor.app.appointments.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,7 +63,8 @@ import java.util.Locale
 
 @Composable
 fun AppointmentListScreen(
-    tokenManager: TokenManager
+    tokenManager: TokenManager,
+    onAppointmentClick: (AppointmentDto) -> Unit = {}
 ) {
     val repository = AppointmentRepository(tokenManager)
     val viewModel: AppointmentViewModel = viewModel(
@@ -73,12 +75,15 @@ fun AppointmentListScreen(
     when (val state = uiState) {
         is UiState.Loading -> LoadingState()
         is UiState.Error -> Box(Modifier.fillMaxSize(), Alignment.Center) { Text(state.message) }
-        is UiState.Success -> AppointmentListContent(state.data)
+        is UiState.Success -> AppointmentListContent(state.data, onAppointmentClick)
     }
 }
 
 @Composable
-private fun AppointmentListContent(appointments: List<AppointmentDto>) {
+private fun AppointmentListContent(
+    appointments: List<AppointmentDto>,
+    onAppointmentClick: (AppointmentDto) -> Unit
+) {
     val groupedAppointments = remember(appointments) {
         appointments.groupBy { it.appointmentDate }.toSortedMap()
     }
@@ -98,7 +103,7 @@ private fun AppointmentListContent(appointments: List<AppointmentDto>) {
                 Spacer(Modifier.height(8.dp))
             }
             items(appointmentsForDate) { appointment ->
-                AppointmentItemCard(appointment)
+                AppointmentItemCard(appointment, onAppointmentClick)
                 Spacer(Modifier.height(16.dp))
             }
         }
@@ -196,37 +201,43 @@ private fun AppointmentHeader(count: Int) {
                 .fillMaxWidth()
                 .padding(start = 20.dp, top = 48.dp, end = 20.dp, bottom = 32.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Text(
+                text = "Appointments",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            
+            Spacer(Modifier.height(12.dp))
+            
+            // Added semi-transparent card for the visit count
+            Surface(
+                color = Color.White.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "Appointments",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    text = "You have $count scheduled visits",
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium
                 )
             }
-            
-            Spacer(Modifier.height(8.dp))
-            
-            Text(
-                text = "You have $count scheduled visits",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.7f)
-            )
         }
     }
 }
 
 @Composable
-private fun AppointmentItemCard(appointment: AppointmentDto) {
+private fun AppointmentItemCard(
+    appointment: AppointmentDto,
+    onClick: (AppointmentDto) -> Unit
+) {
     val isDark = isSystemInDarkTheme()
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp)
+            .clickable { onClick(appointment) },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isDark) Color(0xFF1E2129) else MaterialTheme.colorScheme.surface
@@ -336,7 +347,7 @@ fun AppointmentListScreenPreview() {
     val mockAppointments = listOf(
         AppointmentDto(
             id = "1",
-            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR", "Cardiologist"),
+            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR"),
             patient = PatientDto("1", "Alice Brown", "alice@gmail.com", "PATIENT", 21, "Female", "O+"),
             appointmentDate = today,
             appointmentTime = "09:00 AM",
@@ -344,7 +355,7 @@ fun AppointmentListScreenPreview() {
         ),
         AppointmentDto(
             id = "2",
-            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR", "Cardiologist"),
+            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR"),
             patient = PatientDto("2", "John Smith", "john@gmail.com", "PATIENT", 45, "Male", "A+"),
             appointmentDate = today,
             appointmentTime = "10:30 AM",
@@ -352,7 +363,7 @@ fun AppointmentListScreenPreview() {
         ),
         AppointmentDto(
             id = "3",
-            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR", "Cardiologist"),
+            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR"),
             patient = PatientDto("3", "Jane Doe", "jane@gmail.com", "PATIENT", 30, "Female", "B+"),
             appointmentDate = tomorrow,
             appointmentTime = "11:00 AM",
@@ -360,7 +371,7 @@ fun AppointmentListScreenPreview() {
         ),
         AppointmentDto(
             id = "4",
-            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR", "Cardiologist"),
+            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR"),
             patient = PatientDto("4", "Robert Fox", "robert@gmail.com", "PATIENT", 35, "Male", "AB+"),
             appointmentDate = later,
             appointmentTime = "02:00 PM",
@@ -369,7 +380,7 @@ fun AppointmentListScreenPreview() {
     )
     HealthcareTheme(darkTheme = false) {
         Box(modifier = Modifier.background(if (isSystemInDarkTheme()) Color(0xFF0B0D11) else Color.White)) {
-            AppointmentListContent(mockAppointments)
+            AppointmentListContent(mockAppointments, {})
         }
     }
 }

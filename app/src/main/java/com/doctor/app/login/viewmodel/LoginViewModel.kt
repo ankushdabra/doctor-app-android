@@ -24,9 +24,22 @@ class LoginViewModel(
             _state.value = UiState.Loading
 
             repository.login(email.trim(), password.trim())
-                .onSuccess { token ->
-                    tokenManager.saveToken(token)
-                    _state.value = UiState.Success(true)
+                .onSuccess { response ->
+                    // Save token first
+                    tokenManager.saveToken(response.token)
+                    
+                    // Fetch profile immediately to cache user details
+                    repository.getProfile()
+                        .onSuccess { user ->
+                            tokenManager.saveUserDetails(user)
+                            _state.value = UiState.Success(true)
+                        }
+                        .onFailure { error ->
+                            // Even if profile fetch fails, we have the token, but for consistency
+                            // we might want to handle this. Here we'll treat it as a success 
+                            // since login itself worked, but profile screen will handle its own loading.
+                            _state.value = UiState.Success(true)
+                        }
                 }
                 .onFailure { exception ->
                     _state.value = UiState.Error(exception.message ?: "Login failed")

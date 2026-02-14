@@ -1,19 +1,20 @@
 package com.doctor.app.login.api
 
-import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.core.network.ApiUrlMapper
 import com.doctor.app.core.network.NetworkModule
 import com.doctor.app.core.storage.TokenManager
+
+data class AuthResult(val user: UserDto, val token: String)
 
 class AuthenticationRepository(tokenManager: TokenManager) {
     private val api: ApiUrlMapper = NetworkModule.provideRetrofit(tokenManager)
         .create(ApiUrlMapper::class.java)
 
-    suspend fun login(email: String, password: String): Result<String> {
+    suspend fun login(email: String, password: String): Result<LoginResponseDto> {
         return try {
             val response = api.login(LoginRequestDto(email, password))
             if (response.isSuccessful) {
-                Result.success(response.body()!!.token)
+                Result.success(response.body()!!)
             } else {
                 Result.failure(Exception("Invalid credentials"))
             }
@@ -22,11 +23,11 @@ class AuthenticationRepository(tokenManager: TokenManager) {
         }
     }
 
-    suspend fun registerDoctor(request: DoctorSignUpRequestDto): Result<String> {
+    suspend fun registerDoctor(request: DoctorSignUpRequestDto): Result<SignUpResponseDto> {
         return try {
             val response = api.registerDoctor(request)
             if (response.isSuccessful) {
-                Result.success(response.body()!!.token)
+                Result.success(response.body()!!)
             } else {
                 Result.failure(Exception("Doctor registration failed"))
             }

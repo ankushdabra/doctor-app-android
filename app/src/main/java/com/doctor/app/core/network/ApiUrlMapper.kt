@@ -27,4 +27,7 @@ interface ApiUrlMapper {
 
     @GET("/api/appointments")
     suspend fun getAppointments(): List<AppointmentDto>
+
+    @GET("/api/appointments/today")
+    suspend fun getTodaysAppointments(): List<AppointmentDto>
 }
