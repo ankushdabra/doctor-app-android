@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Card
@@ -113,7 +114,7 @@ private fun AppointmentListContent(
 @Composable
 private fun DateHeader(date: String) {
     val displayDate = remember(date) { getDisplayDate(date) }
-    
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
@@ -146,7 +147,7 @@ private fun getDisplayDate(dateString: String): String {
         val date = LocalDate.parse(dateString)
         val today = LocalDate.now()
         val tomorrow = today.plusDays(1)
-        
+
         when (date) {
             today -> "Today"
             tomorrow -> "Tomorrow"
@@ -160,7 +161,7 @@ private fun getDisplayDate(dateString: String): String {
 @Composable
 private fun AppointmentHeader(count: Int) {
     val isDark = isSystemInDarkTheme()
-    
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,28 +198,82 @@ private fun AppointmentHeader(count: Int) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 24.dp, top = 64.dp, end = 24.dp, bottom = 48.dp)
+                .padding(horizontal = 24.dp, vertical = 48.dp)
         ) {
-            Text(
-                text = "Appointments",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Black,
-                color = Color.White
-            )
-            
-            Spacer(Modifier.height(12.dp))
-            
-            Surface(
-                color = Color.White.copy(alpha = 0.2f),
-                shape = RoundedCornerShape(12.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "You have $count scheduled visits",
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                Surface(
+                    color = Color.White.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "SCHEDULE",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    )
+                }
+
+                Surface(
+                    color = Color.White.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "$count Patients",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Patient Schedule",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Text(
+                        text = "Manage your patient visits and track scheduled consultations efficiently.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.8f),
+                        lineHeight = 20.sp
+                    )
+                }
+
+                Spacer(Modifier.width(16.dp))
+
+                Surface(
+                    modifier = Modifier.size(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White.copy(alpha = 0.15f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -260,9 +315,9 @@ private fun AppointmentItemCard(
                     )
                 }
             }
-            
+
             Spacer(Modifier.width(16.dp))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = appointment.patient.name,
@@ -270,17 +325,17 @@ private fun AppointmentItemCard(
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                
+
                 Spacer(Modifier.height(4.dp))
-                
+
                 Text(
                     text = "${appointment.patient.gender} • ${appointment.patient.age} yrs • ${appointment.patient.bloodGroup}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 Spacer(Modifier.height(10.dp))
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -303,10 +358,12 @@ private fun AppointmentItemCard(
                     )
                 }
             }
-            
+
             Column(horizontalAlignment = Alignment.End) {
                 Surface(
-                    color = if (appointment.status == "BOOKED") MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                    color = if (appointment.status == "BOOKED") MaterialTheme.colorScheme.primary.copy(
+                        alpha = 0.1f
+                    ) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
@@ -317,13 +374,13 @@ private fun AppointmentItemCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                
+
                 Spacer(Modifier.height(12.dp))
-                
+
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos, 
-                    contentDescription = null, 
-                    modifier = Modifier.size(16.dp), 
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                 )
             }
@@ -341,7 +398,15 @@ fun AppointmentListScreenPreview() {
         AppointmentDto(
             id = "1",
             doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR"),
-            patient = PatientDto("1", "Alice Brown", "alice@gmail.com", "PATIENT", 21, "Female", "O+"),
+            patient = PatientDto(
+                "1",
+                "Alice Brown",
+                "alice@gmail.com",
+                "PATIENT",
+                21,
+                "Female",
+                "O+"
+            ),
             appointmentDate = today,
             appointmentTime = "09:00 AM",
             status = "BOOKED"
