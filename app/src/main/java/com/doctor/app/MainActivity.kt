@@ -11,8 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.HealthcareTheme
+import com.doctor.app.login.ui.DashboardScreen
 import com.doctor.app.login.ui.LoginScreen
-import com.doctor.app.login.ui.ProfileScreen
 import com.doctor.app.login.ui.SignUpScreen
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 
                 // Determine start destination based on token
-                val startDestination = if (token == null) "login" else "profile"
+                val startDestination = if (token == null) "login" else "dashboard"
 
                 NavHost(
                     navController = navController,
@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(
                             tokenManager = tokenManager,
                             onLoginSuccess = {
-                                navController.navigate("profile") {
+                                navController.navigate("dashboard") {
                                     popUpTo("login") { inclusive = true }
                                 }
                             },
@@ -56,14 +56,14 @@ class MainActivity : ComponentActivity() {
                         SignUpScreen(
                             tokenManager = tokenManager,
                             onRegistrationSuccess = {
-                                navController.navigate("profile") {
+                                navController.navigate("dashboard") {
                                     popUpTo("login") { inclusive = true }
                                 }
                             }
                         )
                     }
-                    composable("profile") {
-                        ProfileScreen(
+                    composable("dashboard") {
+                        DashboardScreen(
                             tokenManager = tokenManager
                         )
                     }
