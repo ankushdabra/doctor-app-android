@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
@@ -46,6 +47,8 @@ import androidx.compose.ui.unit.sp
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.core.ui.theme.PrimaryLight
+import com.doctor.app.home.ui.HomeScreen
+import com.doctor.app.login.api.UserDto
 
 sealed class DashboardTab(
     val route: String,
@@ -54,9 +57,18 @@ sealed class DashboardTab(
     val unselectedIcon: ImageVector
 ) {
     object Home : DashboardTab("home", "Home", Icons.Filled.Home, Icons.Outlined.Home)
-    object Appointments : DashboardTab("appointments", "Schedule", Icons.Filled.CalendarMonth, Icons.Outlined.CalendarMonth)
-    object Patients : DashboardTab("patients", "Patients", Icons.Filled.People, Icons.Outlined.People)
-    object Profile : DashboardTab("profile_tab", "Profile", Icons.Filled.Person, Icons.Outlined.Person)
+    object Appointments : DashboardTab(
+        "appointments",
+        "Schedule",
+        Icons.Filled.CalendarMonth,
+        Icons.Outlined.CalendarMonth
+    )
+
+    object Patients :
+        DashboardTab("patients", "Patients", Icons.Filled.People, Icons.Outlined.People)
+
+    object Profile :
+        DashboardTab("profile_tab", "Profile", Icons.Filled.Person, Icons.Outlined.Person)
 }
 
 @Composable
@@ -74,8 +86,8 @@ fun DashboardScreen(
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = Color(0xFF1E2129), // Deep charcoal background
-                tonalElevation = 0.dp
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = NavigationBarDefaults.Elevation
             ) {
                 tabs.forEach { tab ->
                     val isSelected = selectedTab == tab
@@ -99,11 +111,11 @@ fun DashboardScreen(
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.White,
-                            selectedTextColor = Color.White,
-                            unselectedIconColor = Color.White.copy(alpha = 0.6f),
-                            unselectedTextColor = Color.White.copy(alpha = 0.6f),
-                            indicatorColor = PrimaryLight // The blue pill indicator
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -113,7 +125,6 @@ fun DashboardScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
@@ -126,30 +137,56 @@ fun DashboardScreen(
             AnimatedContent(
                 targetState = selectedTab,
                 transitionSpec = {
-                    (fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + 
-                     scaleIn(initialScale = 0.95f, animationSpec = spring(stiffness = Spring.StiffnessLow)))
+                    (fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) +
+                            scaleIn(
+                                initialScale = 0.95f,
+                                animationSpec = spring(stiffness = Spring.StiffnessLow)
+                            ))
                         .togetherWith(fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)))
                 }
             ) { targetTab ->
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
                 ) {
                     when (targetTab) {
                         DashboardTab.Home -> {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("Doctor Dashboard", style = MaterialTheme.typography.headlineMedium)
-                            }
+                            HomeScreen(
+                                UserDto(
+                                    id = "1",
+                                    name = "Aarti Mishra",
+                                    email = "aarti.mishra@healthcare.com",
+                                    role = "DOCTOR",
+                                    specialization = "Dentist"
+                                )
+                            )
                         }
+
                         DashboardTab.Appointments -> {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("Appointments Schedule", style = MaterialTheme.typography.headlineMedium)
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "Appointments Schedule",
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
                             }
                         }
+
                         DashboardTab.Patients -> {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("Patient Records", style = MaterialTheme.typography.headlineMedium)
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "Patient Records",
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
                             }
                         }
+
                         DashboardTab.Profile -> {
                             ProfileScreen(
                                 tokenManager = tokenManager
@@ -165,7 +202,7 @@ fun DashboardScreen(
 @Preview(showBackground = true)
 @Composable
 fun DashboardScreenPreview() {
-    HealthcareTheme(darkTheme = true) {
+    HealthcareTheme(darkTheme = false) {
         DashboardScreen(tokenManager = TokenManager(LocalContext.current))
     }
 }
