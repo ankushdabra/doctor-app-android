@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -53,10 +53,35 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.appointments.api.AppointmentRepository
+import com.doctor.app.appointments.api.PatientDto
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
+import com.doctor.app.core.ui.theme.EarningsAccentDark
+import com.doctor.app.core.ui.theme.EarningsAccentLight
+import com.doctor.app.core.ui.theme.EarningsCardDark
+import com.doctor.app.core.ui.theme.EarningsCardLight
 import com.doctor.app.core.ui.theme.HealthcareTheme
+import com.doctor.app.core.ui.theme.PatientsTodayAccentDark
+import com.doctor.app.core.ui.theme.PatientsTodayAccentLight
+import com.doctor.app.core.ui.theme.PatientsTodayCardDark
+import com.doctor.app.core.ui.theme.PatientsTodayCardLight
 import com.doctor.app.core.ui.theme.PrimaryLight
+import com.doctor.app.core.ui.theme.ScheduleAmberAccentDark
+import com.doctor.app.core.ui.theme.ScheduleAmberAccentLight
+import com.doctor.app.core.ui.theme.ScheduleAmberDark
+import com.doctor.app.core.ui.theme.ScheduleAmberLight
+import com.doctor.app.core.ui.theme.SchedulePurpleAccentDark
+import com.doctor.app.core.ui.theme.SchedulePurpleAccentLight
+import com.doctor.app.core.ui.theme.SchedulePurpleDark
+import com.doctor.app.core.ui.theme.SchedulePurpleLight
+import com.doctor.app.core.ui.theme.ScheduleRoseAccentDark
+import com.doctor.app.core.ui.theme.ScheduleRoseAccentLight
+import com.doctor.app.core.ui.theme.ScheduleRoseDark
+import com.doctor.app.core.ui.theme.ScheduleRoseLight
+import com.doctor.app.core.ui.theme.ScheduleTealAccentDark
+import com.doctor.app.core.ui.theme.ScheduleTealAccentLight
+import com.doctor.app.core.ui.theme.ScheduleTealDark
+import com.doctor.app.core.ui.theme.ScheduleTealLight
 import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.home.viewmodel.HomeViewModel
 import com.doctor.app.home.viewmodel.HomeViewModelFactory
@@ -319,7 +344,6 @@ private fun NextAppointmentHighlight(
 
 @Composable
 private fun StatsGrid(uiState: UiState<List<AppointmentDto>>) {
-    // Check if current theme is dark based on background luminance
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val count = if (uiState is UiState.Success) uiState.data.size.toString() else "--"
     
@@ -334,16 +358,16 @@ private fun StatsGrid(uiState: UiState<List<AppointmentDto>>) {
             title = "Patients Today",
             value = count,
             icon = Icons.Outlined.Group,
-            containerColor = if (isDark) Color(0xFF1E2A4A) else Color(0xFFE3F2FD),
-            accentColor = if (isDark) Color(0xFF64B5F6) else Color(0xFF1976D2)
+            containerColor = if (isDark) PatientsTodayCardDark else PatientsTodayCardLight,
+            accentColor = if (isDark) PatientsTodayAccentDark else PatientsTodayAccentLight
         )
         StatCardEnhanced(
             modifier = Modifier.weight(1f),
             title = "Total Earnings",
             value = "₹8.4k",
             icon = Icons.Outlined.History,
-            containerColor = if (isDark) Color(0xFF243425) else Color(0xFFF1F8E9),
-            accentColor = if (isDark) Color(0xFF81C784) else Color(0xFF388E3C)
+            containerColor = if (isDark) EarningsCardDark else EarningsCardLight,
+            accentColor = if (isDark) EarningsAccentDark else EarningsAccentLight
         )
     }
 }
@@ -385,7 +409,7 @@ private fun StatCardEnhanced(
             )
             Text(
                 text = title, 
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelSmall, 
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -402,12 +426,39 @@ private fun AppointmentsRow(
         return
     }
 
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    
+    val colorSchemes = listOf(
+        Pair(
+            if (isDark) ScheduleAmberDark else ScheduleAmberLight,
+            if (isDark) ScheduleAmberAccentDark else ScheduleAmberAccentLight
+        ),
+        Pair(
+            if (isDark) SchedulePurpleDark else SchedulePurpleLight,
+            if (isDark) SchedulePurpleAccentDark else SchedulePurpleAccentLight
+        ),
+        Pair(
+            if (isDark) ScheduleTealDark else ScheduleTealLight,
+            if (isDark) ScheduleTealAccentDark else ScheduleTealAccentLight
+        ),
+        Pair(
+            if (isDark) ScheduleRoseDark else ScheduleRoseLight,
+            if (isDark) ScheduleRoseAccentDark else ScheduleRoseAccentLight
+        )
+    )
+
     LazyRow(
         contentPadding = PaddingValues(horizontal = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(appointments) { appointment ->
-            AppointmentSmallCard(appointment, onAppointmentClick)
+        itemsIndexed(appointments) { index, appointment ->
+            val colorScheme = colorSchemes[index % colorSchemes.size]
+            AppointmentSmallCard(
+                appointment = appointment, 
+                containerColor = colorScheme.first,
+                accentColor = colorScheme.second,
+                onClick = onAppointmentClick
+            )
         }
     }
 }
@@ -415,6 +466,8 @@ private fun AppointmentsRow(
 @Composable
 private fun AppointmentSmallCard(
     appointment: AppointmentDto,
+    containerColor: Color,
+    accentColor: Color,
     onClick: (AppointmentDto) -> Unit
 ) {
     Card(
@@ -422,17 +475,35 @@ private fun AppointmentSmallCard(
             .width(160.dp)
             .clickable { onClick(appointment) },
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Surface(modifier = Modifier.size(40.dp), shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer) {
+            Surface(
+                modifier = Modifier.size(40.dp), 
+                shape = CircleShape, 
+                color = accentColor.copy(alpha = 0.15f)
+            ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.Person, null, tint = MaterialTheme.colorScheme.primary)
+                    Icon(
+                        imageVector = Icons.Default.Person, 
+                        contentDescription = null, 
+                        tint = accentColor
+                    )
                 }
             }
             Spacer(Modifier.height(12.dp))
-            Text(appointment.patient.name, fontWeight = FontWeight.Bold, maxLines = 1)
-            Text(appointment.appointmentTime, style = MaterialTheme.typography.labelSmall, color = PrimaryLight)
+            Text(
+                text = appointment.patient.name, 
+                fontWeight = FontWeight.Bold, 
+                maxLines = 1,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = appointment.appointmentTime, 
+                style = MaterialTheme.typography.labelSmall, 
+                color = accentColor,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }
@@ -484,10 +555,44 @@ fun HomeScreenPreview() {
         email = "aarti.mishra@healthcare.com",
         role = "DOCTOR"
     )
+    val mockAppointments = listOf(
+        AppointmentDto(
+            id = "1",
+            doctor = mockDoctor,
+            patient = PatientDto("1", "Rahul Kumar", "rahul@gmail.com", "PATIENT", 28, "Male", "O+"),
+            appointmentDate = "Today",
+            appointmentTime = "10:30 AM",
+            status = "BOOKED"
+        ),
+        AppointmentDto(
+            id = "2",
+            doctor = mockDoctor,
+            patient = PatientDto("2", "Alice Smith", "alice@gmail.com", "PATIENT", 24, "Female", "A-"),
+            appointmentDate = "Today",
+            appointmentTime = "11:15 AM",
+            status = "BOOKED"
+        ),
+        AppointmentDto(
+            id = "3",
+            doctor = mockDoctor,
+            patient = PatientDto("3", "John Doe", "john@gmail.com", "PATIENT", 45, "Male", "B+"),
+            appointmentDate = "Today",
+            appointmentTime = "12:00 PM",
+            status = "BOOKED"
+        ),
+        AppointmentDto(
+            id = "4",
+            doctor = mockDoctor,
+            patient = PatientDto("4", "Priya Singh", "priya@gmail.com", "PATIENT", 32, "Female", "O-"),
+            appointmentDate = "Today",
+            appointmentTime = "02:30 PM",
+            status = "BOOKED"
+        )
+    )
     HealthcareTheme {
         HomeScreen(
             doctor = mockDoctor,
-            uiState = UiState.Success(emptyList())
+            uiState = UiState.Success(mockAppointments)
         )
     }
 }
