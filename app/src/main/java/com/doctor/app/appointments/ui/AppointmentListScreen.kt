@@ -167,11 +167,7 @@ private fun AppointmentHeader(count: Int) {
             .clip(RoundedCornerShape(bottomStart = 45.dp, bottomEnd = 45.dp))
             .background(
                 brush = Brush.linearGradient(
-                    colors = if (isDark) {
-                        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer)
-                    } else {
-                        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
-                    },
+                    colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
                     start = Offset(0f, 0f),
                     end = Offset(1000f, 1000f)
                 )

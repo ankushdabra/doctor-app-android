@@ -53,6 +53,8 @@ import androidx.compose.ui.unit.sp
 import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.appointments.api.PatientDto
 import com.doctor.app.core.ui.theme.HealthcareTheme
+import com.doctor.app.core.ui.theme.PrimaryLight
+import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.UserDto
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,43 +85,7 @@ fun AppointmentDetailScreen(
                     .padding(horizontal = 20.dp, vertical = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Schedule Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp, horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        ScheduleItem(
-                            icon = Icons.Default.CalendarToday,
-                            value = appointment.appointmentDate,
-                            isFloating = true
-                        )
-                        Box(
-                            modifier = Modifier
-                                .width(1.dp)
-                                .height(32.dp)
-                                .background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
-                        )
-                        ScheduleItem(
-                            icon = Icons.Default.Schedule,
-                            value = appointment.appointmentTime,
-                            isFloating = true
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                // Enhanced Patient Metrics Card
+                // Patient Metrics Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(32.dp),
@@ -358,11 +324,7 @@ private fun DetailHeader(
             .clip(RoundedCornerShape(bottomStart = 45.dp, bottomEnd = 45.dp))
             .background(
                 brush = Brush.linearGradient(
-                    colors = if (isDark) {
-                        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer)
-                    } else {
-                        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
-                    },
+                    colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
                     start = Offset(0f, 0f),
                     end = Offset(1000f, 1000f)
                 )
@@ -391,18 +353,18 @@ private fun DetailHeader(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 48.dp, bottom = 48.dp),
+                .padding(top = 48.dp, bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Patient Photo
+            // Profile Picture
             Surface(
-                modifier = Modifier.size(110.dp),
+                modifier = Modifier.size(100.dp),
                 shape = CircleShape,
                 color = Color.White.copy(alpha = 0.2f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Surface(
-                        modifier = Modifier.size(98.dp),
+                        modifier = Modifier.size(88.dp),
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
                     ) {
@@ -410,7 +372,7 @@ private fun DetailHeader(
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
-                                modifier = Modifier.size(50.dp),
+                                modifier = Modifier.size(44.dp),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -420,7 +382,6 @@ private fun DetailHeader(
 
             Spacer(Modifier.height(16.dp))
 
-            // Name
             Text(
                 text = appointment.patient.name,
                 style = MaterialTheme.typography.headlineMedium,
@@ -440,6 +401,42 @@ private fun DetailHeader(
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            // Integrated Schedule Section
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                shape = RoundedCornerShape(24.dp),
+                color = Color.White.copy(alpha = 0.15f)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp, horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    ScheduleItem(
+                        icon = Icons.Default.CalendarToday,
+                        value = appointment.appointmentDate,
+                        isFloating = false
+                    )
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(32.dp)
+                            .background(Color.White.copy(alpha = 0.3f))
+                    )
+                    ScheduleItem(
+                        icon = Icons.Default.Schedule,
+                        value = appointment.appointmentTime,
+                        isFloating = false
+                    )
+                }
             }
         }
     }
