@@ -24,7 +24,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material.icons.outlined.Upcoming
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -40,7 +43,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,7 +80,10 @@ fun AppointmentListScreen(
 
     when (val state = uiState) {
         is UiState.Loading -> LoadingState()
-        is UiState.Error -> Box(Modifier.fillMaxSize(), Alignment.Center) { Text(state.message) }
+        is UiState.Error -> AppointmentErrorState(
+            message = state.message,
+            onRetry = viewModel::loadAppointments
+        )
         is UiState.Success -> AppointmentListContent(state.data, onAppointmentClick)
     }
 }
@@ -85,6 +93,11 @@ private fun AppointmentListContent(
     appointments: List<AppointmentDto>,
     onAppointmentClick: (AppointmentDto) -> Unit
 ) {
+    if (appointments.isEmpty()) {
+        EmptyAppointmentsState()
+        return
+    }
+
     val groupedAppointments = remember(appointments) {
         appointments.groupBy { it.appointmentDate }.toSortedMap()
     }
@@ -107,6 +120,130 @@ private fun AppointmentListContent(
                 AppointmentItemCard(appointment, onAppointmentClick)
                 Spacer(Modifier.height(16.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun EmptyAppointmentsState() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(160.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Upcoming,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        Text(
+            text = "No Patients Scheduled",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = "Your schedule is currently clear. New patient bookings and upcoming consultations will appear here automatically.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(0.9f),
+            lineHeight = 24.sp
+        )
+    }
+}
+
+@Composable
+private fun AppointmentErrorState(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.ErrorOutline,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        Text(
+            text = "Failed to load schedule",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(0.8f)
+        )
+
+        Spacer(Modifier.height(48.dp))
+
+        Button(
+            onClick = onRetry,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Text(
+                text = "Try Again",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -430,5 +567,24 @@ fun AppointmentListScreenPreview() {
     )
     HealthcareTheme {
         AppointmentListContent(mockAppointments, {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EmptyAppointmentListPreview() {
+    HealthcareTheme {
+        AppointmentListContent(emptyList(), {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppointmentErrorPreview() {
+    HealthcareTheme {
+        AppointmentErrorState(
+            message = "Unable to connect to the server. Please try again.",
+            onRetry = {}
+        )
     }
 }
