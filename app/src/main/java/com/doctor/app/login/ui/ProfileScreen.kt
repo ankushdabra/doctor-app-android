@@ -1,6 +1,7 @@
 package com.doctor.app.login.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -200,6 +201,7 @@ fun ProfileContent(
 ) {
     val details = user.doctorDetails
     val displayName = if (user.name.startsWith("Dr.", ignoreCase = true)) user.name else "Dr. ${user.name}"
+    val isDark = isSystemInDarkTheme()
     
     Column(
         modifier = Modifier
@@ -210,13 +212,14 @@ fun ProfileContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
+                .clip(RoundedCornerShape(bottomStart = 45.dp, bottomEnd = 45.dp))
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(
-                            PrimaryLight,
-                            SecondaryLight.copy(alpha = 0.8f)
-                        ),
+                        colors = if (isDark) {
+                            listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer)
+                        } else {
+                            listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
+                        },
                         start = Offset(0f, 0f),
                         end = Offset(1000f, 1000f)
                     )
@@ -225,20 +228,20 @@ fun ProfileContent(
             // Decorative background elements
             Box(
                 modifier = Modifier
-                    .offset(x = 260.dp, y = (-30).dp)
-                    .size(180.dp)
+                    .offset(x = 280.dp, y = (-40).dp)
+                    .size(200.dp)
                     .background(
-                        color = Color.White.copy(alpha = 0.08f),
+                        color = Color.White.copy(alpha = if (isDark) 0.04f else 0.08f),
                         shape = CircleShape
                     )
             )
             
             Box(
                 modifier = Modifier
-                    .offset(x = (-20).dp, y = 120.dp)
-                    .size(100.dp)
+                    .offset(x = (-30).dp, y = 110.dp)
+                    .size(120.dp)
                     .background(
-                        color = Color.White.copy(alpha = 0.05f),
+                        color = Color.White.copy(alpha = if (isDark) 0.03f else 0.05f),
                         shape = CircleShape
                     )
             )

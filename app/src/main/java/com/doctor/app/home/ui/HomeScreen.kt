@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -318,7 +319,8 @@ private fun NextAppointmentHighlight(
 
 @Composable
 private fun StatsGrid(uiState: UiState<List<AppointmentDto>>) {
-    val isDark = isSystemInDarkTheme()
+    // Check if current theme is dark based on background luminance
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val count = if (uiState is UiState.Success) uiState.data.size.toString() else "--"
     
     Row(
@@ -332,14 +334,16 @@ private fun StatsGrid(uiState: UiState<List<AppointmentDto>>) {
             title = "Patients Today",
             value = count,
             icon = Icons.Outlined.Group,
-            containerColor = if (isDark) MaterialTheme.colorScheme.surface else Color(0xFFE3F2FD)
+            containerColor = if (isDark) Color(0xFF1E2A4A) else Color(0xFFE3F2FD),
+            accentColor = if (isDark) Color(0xFF64B5F6) else Color(0xFF1976D2)
         )
         StatCardEnhanced(
             modifier = Modifier.weight(1f),
             title = "Total Earnings",
             value = "₹8.4k",
             icon = Icons.Outlined.History,
-            containerColor = if (isDark) MaterialTheme.colorScheme.surface else Color(0xFFF1F8E9)
+            containerColor = if (isDark) Color(0xFF243425) else Color(0xFFF1F8E9),
+            accentColor = if (isDark) Color(0xFF81C784) else Color(0xFF388E3C)
         )
     }
 }
@@ -350,7 +354,8 @@ private fun StatCardEnhanced(
     title: String,
     value: String,
     icon: ImageVector,
-    containerColor: Color
+    containerColor: Color,
+    accentColor: Color
 ) {
     Card(
         modifier = modifier,
@@ -361,14 +366,28 @@ private fun StatCardEnhanced(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(Color.White.copy(alpha = 0.5f), CircleShape),
+                    .background(accentColor.copy(alpha = 0.15f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    imageVector = icon, 
+                    contentDescription = null, 
+                    modifier = Modifier.size(20.dp), 
+                    tint = accentColor
+                )
             }
             Spacer(Modifier.height(16.dp))
-            Text(value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = value, 
+                style = MaterialTheme.typography.headlineSmall, 
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = title, 
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

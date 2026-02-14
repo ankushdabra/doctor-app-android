@@ -112,7 +112,6 @@ private fun AppointmentListContent(
 
 @Composable
 private fun DateHeader(date: String) {
-    val isDark = isSystemInDarkTheme()
     val displayDate = remember(date) { getDisplayDate(date) }
     
     Row(
@@ -123,20 +122,20 @@ private fun DateHeader(date: String) {
             text = displayDate,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.ExtraBold,
-            color = if (isDark) Color.White else Color.Black
+            color = MaterialTheme.colorScheme.onBackground
         )
         if (displayDate == "Today" || displayDate == "Tomorrow") {
             Spacer(Modifier.width(8.dp))
             Box(
                 modifier = Modifier
                     .size(6.dp)
-                    .background(PrimaryLight, CircleShape)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                text = date, // Show actual date in small text
+                text = date,
                 style = MaterialTheme.typography.labelSmall,
-                color = if (isDark) Color.White.copy(alpha = 0.4f) else Color.Gray
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
             )
         }
     }
@@ -160,16 +159,19 @@ private fun getDisplayDate(dateString: String): String {
 
 @Composable
 private fun AppointmentHeader(count: Int) {
+    val isDark = isSystemInDarkTheme()
+    
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
+            .clip(RoundedCornerShape(bottomStart = 45.dp, bottomEnd = 45.dp))
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(
-                        PrimaryLight,
-                        SecondaryLight.copy(alpha = 0.8f)
-                    ),
+                    colors = if (isDark) {
+                        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer)
+                    } else {
+                        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
+                    },
                     start = Offset(0f, 0f),
                     end = Offset(1000f, 1000f)
                 )
@@ -178,20 +180,20 @@ private fun AppointmentHeader(count: Int) {
         // Decorative background elements
         Box(
             modifier = Modifier
-                .offset(x = 260.dp, y = (-30).dp)
-                .size(180.dp)
+                .offset(x = 280.dp, y = (-40).dp)
+                .size(200.dp)
                 .background(
-                    color = Color.White.copy(alpha = 0.08f),
+                    color = Color.White.copy(alpha = if (isDark) 0.04f else 0.08f),
                     shape = CircleShape
                 )
         )
 
         Box(
             modifier = Modifier
-                .offset(x = (-20).dp, y = 120.dp)
-                .size(100.dp)
+                .offset(x = (-30).dp, y = 110.dp)
+                .size(120.dp)
                 .background(
-                    color = Color.White.copy(alpha = 0.05f),
+                    color = Color.White.copy(alpha = if (isDark) 0.03f else 0.05f),
                     shape = CircleShape
                 )
         )
@@ -199,20 +201,19 @@ private fun AppointmentHeader(count: Int) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, top = 48.dp, end = 20.dp, bottom = 32.dp)
+                .padding(start = 24.dp, top = 64.dp, end = 24.dp, bottom = 48.dp)
         ) {
             Text(
                 text = "Appointments",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Black,
                 color = Color.White
             )
             
             Spacer(Modifier.height(12.dp))
             
-            // Added semi-transparent card for the visit count
             Surface(
-                color = Color.White.copy(alpha = 0.15f),
+                color = Color.White.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
@@ -220,7 +221,7 @@ private fun AppointmentHeader(count: Int) {
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -232,7 +233,6 @@ private fun AppointmentItemCard(
     appointment: AppointmentDto,
     onClick: (AppointmentDto) -> Unit
 ) {
-    val isDark = isSystemInDarkTheme()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -240,7 +240,7 @@ private fun AppointmentItemCard(
             .clickable { onClick(appointment) },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isDark) Color(0xFF1E2129) else MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -250,17 +250,16 @@ private fun AppointmentItemCard(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Patient Avatar Placeholder
             Surface(
                 modifier = Modifier.size(64.dp),
                 shape = RoundedCornerShape(16.dp),
-                color = if (isDark) Color.White.copy(alpha = 0.05f) else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = null,
-                        tint = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -273,7 +272,7 @@ private fun AppointmentItemCard(
                     text = appointment.patient.name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = if (isDark) Color.White else Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 
                 Spacer(Modifier.height(4.dp))
@@ -281,45 +280,44 @@ private fun AppointmentItemCard(
                 Text(
                     text = "${appointment.patient.gender} • ${appointment.patient.age} yrs • ${appointment.patient.bloodGroup}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (isDark) Color.White.copy(alpha = 0.6f) else Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 Spacer(Modifier.height(10.dp))
                 
-                // Enhanced time display
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color(0xFFF5F5F5))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Timer,
                         contentDescription = null,
                         modifier = Modifier.size(14.dp),
-                        tint = Color(0xFFFFB74D)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
                         text = appointment.appointmentTime,
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (isDark) Color.White.copy(alpha = 0.8f) else Color.DarkGray
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
             
             Column(horizontalAlignment = Alignment.End) {
                 Surface(
-                    color = if (appointment.status == "BOOKED") MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color.Gray.copy(alpha = 0.1f),
+                    color = if (appointment.status == "BOOKED") MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = appointment.status,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (appointment.status == "BOOKED") MaterialTheme.colorScheme.primary else Color.Gray,
+                        color = if (appointment.status == "BOOKED") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -330,7 +328,7 @@ private fun AppointmentItemCard(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos, 
                     contentDescription = null, 
                     modifier = Modifier.size(16.dp), 
-                    tint = if (isDark) Color.White.copy(alpha = 0.3f) else Color.LightGray
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                 )
             }
         }
@@ -342,7 +340,6 @@ private fun AppointmentItemCard(
 fun AppointmentListScreenPreview() {
     val today = LocalDate.now().toString()
     val tomorrow = LocalDate.now().plusDays(1).toString()
-    val later = LocalDate.now().plusDays(2).toString()
 
     val mockAppointments = listOf(
         AppointmentDto(
@@ -368,19 +365,9 @@ fun AppointmentListScreenPreview() {
             appointmentDate = tomorrow,
             appointmentTime = "11:00 AM",
             status = "BOOKED"
-        ),
-        AppointmentDto(
-            id = "4",
-            doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR"),
-            patient = PatientDto("4", "Robert Fox", "robert@gmail.com", "PATIENT", 35, "Male", "AB+"),
-            appointmentDate = later,
-            appointmentTime = "02:00 PM",
-            status = "BOOKED"
         )
     )
-    HealthcareTheme(darkTheme = false) {
-        Box(modifier = Modifier.background(if (isSystemInDarkTheme()) Color(0xFF0B0D11) else Color.White)) {
-            AppointmentListContent(mockAppointments, {})
-        }
+    HealthcareTheme {
+        AppointmentListContent(mockAppointments, {})
     }
 }
