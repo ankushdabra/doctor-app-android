@@ -1,5 +1,6 @@
 package com.doctor.app.core.network
 
+import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.login.api.DoctorSignUpRequestDto
 import com.doctor.app.login.api.LoginRequestDto
 import com.doctor.app.login.api.LoginResponseDto
@@ -23,4 +24,7 @@ interface ApiUrlMapper {
 
     @GET("/api/profile")
     suspend fun getProfile(): UserDto
+
+    @GET("/api/appointments")
+    suspend fun getAppointments(): List<AppointmentDto>
 }

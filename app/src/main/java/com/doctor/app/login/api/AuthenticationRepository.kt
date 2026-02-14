@@ -1,5 +1,6 @@
 package com.doctor.app.login.api
 
+import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.core.network.ApiUrlMapper
 import com.doctor.app.core.network.NetworkModule
 import com.doctor.app.core.storage.TokenManager

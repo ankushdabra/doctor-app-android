@@ -44,6 +44,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.doctor.app.appointments.api.AppointmentDto
+import com.doctor.app.appointments.api.PatientDto
+import com.doctor.app.appointments.ui.AppointmentListScreen
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.core.ui.theme.PrimaryLight
@@ -164,15 +167,7 @@ fun DashboardScreen(
                         }
 
                         DashboardTab.Appointments -> {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    "Appointments Schedule",
-                                    style = MaterialTheme.typography.headlineMedium
-                                )
-                            }
+                            AppointmentListScreen(tokenManager = tokenManager)
                         }
 
                         DashboardTab.Patients -> {
