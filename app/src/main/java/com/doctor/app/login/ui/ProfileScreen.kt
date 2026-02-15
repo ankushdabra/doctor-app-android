@@ -545,7 +545,6 @@ fun ProfileContent(
                                 onValueChange = { about = it },
                                 label = { Text("About") },
                                 modifier = Modifier.fillMaxWidth(),
-                                minLines = 3,
                                 maxLines = 5
                             )
                         } else {
