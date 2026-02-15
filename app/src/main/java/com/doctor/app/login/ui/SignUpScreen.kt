@@ -2,64 +2,35 @@ package com.doctor.app.login.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberTimePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -67,6 +38,8 @@ import com.doctor.app.R
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.theme.HealthcareTheme
+import com.doctor.app.core.ui.theme.PrimaryLight
+import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.api.DoctorSignUpRequestDto
 import com.doctor.app.login.api.TimeSlotDto
@@ -169,161 +142,206 @@ fun SignUpContent(
         return isValid
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(
+    Scaffold { padding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            // Background Elements
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .clip(RoundedCornerShape(bottomStart = 64.dp, bottomEnd = 64.dp))
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f))
                         )
                     )
-                )
-                .imePadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(64.dp))
-            Image(
-                painter = painterResource(id = R.drawable.ic_healthcare_logo),
-                contentDescription = "App Logo",
-                modifier = Modifier.size(120.dp)
             )
-            Text(
-                text = "Doctor Registration",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = if (currentStep == SignUpStep.PersonalDetails) "Step 1: Professional Details" else "Step 2: Availability Slots",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.height(32.dp))
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(4.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    if (currentStep == SignUpStep.PersonalDetails) {
-                        PersonalDetailsForm(
-                            name = name,
-                            onNameChange = { name = it; nameError = null },
-                            nameError = nameError,
-                            email = email,
-                            onEmailChange = { email = it; emailError = null },
-                            emailError = emailError,
-                            password = password,
-                            onPasswordChange = { password = it; passwordError = null },
-                            passwordError = passwordError,
-                            specialization = specialization,
-                            onSpecializationChange = {
-                                specialization = it; specializationError = null
-                            },
-                            specializationError = specializationError,
-                            qualification = qualification,
-                            onQualificationChange = {
-                                qualification = it; qualificationError = null
-                            },
-                            qualificationError = qualificationError,
-                            experience = experience,
-                            onExperienceChange = { experience = it; experienceError = null },
-                            experienceError = experienceError,
-                            consultationFee = consultationFee,
-                            onConsultationFeeChange = {
-                                consultationFee = it; consultationFeeError = null
-                            },
-                            consultationFeeError = consultationFeeError,
-                            clinicAddress = clinicAddress,
-                            onClinicAddressChange = {
-                                clinicAddress = it; clinicAddressError = null
-                            },
-                            clinicAddressError = clinicAddressError,
-                            about = about,
-                            onAboutChange = { about = it; aboutError = null },
-                            aboutError = aboutError
-                        )
+                Spacer(modifier = Modifier.height(50.dp))
 
-                        Spacer(Modifier.height(24.dp))
-                        Button(
-                            onClick = {
-                                if (validatePersonalDetails()) currentStep = SignUpStep.Availability
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(54.dp),
-                            shape = RoundedCornerShape(16.dp)
+                // Logo with Glow
+                Surface(
+                    modifier = Modifier.size(90.dp),
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = 0.2f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Surface(
+                            modifier = Modifier.size(70.dp),
+                            shape = CircleShape,
+                            color = Color.White
                         ) {
-                            Text("Next", style = MaterialTheme.typography.titleMedium)
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_healthcare_logo),
+                                contentDescription = "Logo",
+                                modifier = Modifier.padding(14.dp),
+                                contentScale = ContentScale.Fit
+                            )
                         }
-                    } else {
-                        AvailabilityForm(
-                            availability = availability,
-                            onAvailabilityChange = { availability = it }
-                        )
-
-                        Spacer(Modifier.height(24.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            OutlinedButton(
-                                onClick = { currentStep = SignUpStep.PersonalDetails },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(54.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Text("Back")
-                            }
-                            Button(
-                                onClick = {
-                                    onRegisterClick(
-                                        DoctorSignUpRequestDto(
-                                            name = name,
-                                            email = email,
-                                            password = password,
-                                            specialization = specialization,
-                                            qualification = qualification,
-                                            experience = experience.toIntOrNull() ?: 0,
-                                            consultationFee = consultationFee.toDoubleOrNull()
-                                                ?: 0.0,
-                                            about = about,
-                                            clinicAddress = clinicAddress,
-                                            availability = availability
-                                        )
-                                    )
-                                },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(54.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                enabled = state !is UiState.Loading
-                            ) {
-                                Text("Register")
-                            }
-                        }
-                    }
-
-                    if (state is UiState.Loading) {
-                        Spacer(Modifier.height(16.dp))
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                    }
-                    if (state is UiState.Error) {
-                        Spacer(Modifier.height(16.dp))
-                        Text(
-                            text = state.message,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Doctor Registration",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White
+                )
+
+                Text(
+                    text = if (currentStep == SignUpStep.PersonalDetails) "Step 1: Professional Details" else "Step 2: Availability Slots",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(32.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Column(modifier = Modifier.padding(24.dp)) {
+                        if (currentStep == SignUpStep.PersonalDetails) {
+                            PersonalDetailsForm(
+                                name = name,
+                                onNameChange = { name = it; nameError = null },
+                                nameError = nameError,
+                                email = email,
+                                onEmailChange = { email = it; emailError = null },
+                                emailError = emailError,
+                                password = password,
+                                onPasswordChange = { password = it; passwordError = null },
+                                passwordError = passwordError,
+                                specialization = specialization,
+                                onSpecializationChange = {
+                                    specialization = it; specializationError = null
+                                },
+                                specializationError = specializationError,
+                                qualification = qualification,
+                                onQualificationChange = {
+                                    qualification = it; qualificationError = null
+                                },
+                                qualificationError = qualificationError,
+                                experience = experience,
+                                onExperienceChange = { experience = it; experienceError = null },
+                                experienceError = experienceError,
+                                consultationFee = consultationFee,
+                                onConsultationFeeChange = {
+                                    consultationFee = it; consultationFeeError = null
+                                },
+                                consultationFeeError = consultationFeeError,
+                                clinicAddress = clinicAddress,
+                                onClinicAddressChange = {
+                                    clinicAddress = it; clinicAddressError = null
+                                },
+                                clinicAddressError = clinicAddressError,
+                                about = about,
+                                onAboutChange = { about = it; aboutError = null },
+                                aboutError = aboutError
+                            )
+
+                            Spacer(Modifier.height(32.dp))
+                            Button(
+                                onClick = {
+                                    if (validatePersonalDetails()) currentStep = SignUpStep.Availability
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                            ) {
+                                Text("Next Step", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.width(8.dp))
+                                Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(20.dp))
+                            }
+                        } else {
+                            AvailabilityForm(
+                                availability = availability,
+                                onAvailabilityChange = { availability = it }
+                            )
+
+                            Spacer(Modifier.height(32.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = { currentStep = SignUpStep.PersonalDetails },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(56.dp),
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(4.dp))
+                                    Text("Back", fontWeight = FontWeight.Bold)
+                                }
+                                Button(
+                                    onClick = {
+                                        onRegisterClick(
+                                            DoctorSignUpRequestDto(
+                                                name = name,
+                                                email = email,
+                                                password = password,
+                                                specialization = specialization,
+                                                qualification = qualification,
+                                                experience = experience.toIntOrNull() ?: 0,
+                                                consultationFee = consultationFee.toDoubleOrNull()
+                                                    ?: 0.0,
+                                                about = about,
+                                                clinicAddress = clinicAddress,
+                                                availability = availability
+                                            )
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .weight(1.3f)
+                                        .height(56.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    enabled = state !is UiState.Loading,
+                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                                ) {
+                                    if (state is UiState.Loading) {
+                                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                                    } else {
+                                        Text("Complete", fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                        }
+
+                        if (state is UiState.Error) {
+                            Spacer(Modifier.height(16.dp))
+                            Text(
+                                text = state.message,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(48.dp))
             }
-            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }
@@ -362,6 +380,7 @@ fun PersonalDetailsForm(
     var specializationExpanded by remember { mutableStateOf(false) }
     var qualificationExpanded by remember { mutableStateOf(false) }
     var experienceExpanded by remember { mutableStateOf(false) }
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
@@ -380,45 +399,56 @@ fun PersonalDetailsForm(
         value = name,
         onValueChange = onNameChange,
         label = { Text("Full Name") },
+        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
         isError = nameError != null,
         supportingText = nameError?.let { { Text(it) } },
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
     )
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(8.dp))
     OutlinedTextField(
         value = email,
         onValueChange = onEmailChange,
-        label = { Text("Email") },
+        label = { Text("Email Address") },
+        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
         isError = emailError != null,
         supportingText = emailError?.let { { Text(it) } },
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next
         ),
         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
     )
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(8.dp))
     OutlinedTextField(
         value = password,
         onValueChange = onPasswordChange,
         label = { Text("Password") },
+        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        trailingIcon = {
+            IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                Icon(if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null)
+            }
+        },
         isError = passwordError != null,
         supportingText = passwordError?.let { { Text(it) } },
         singleLine = true,
-        visualTransformation = PasswordVisualTransformation(),
+        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Next
         ),
         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
     )
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(16.dp))
 
     ExposedDropdownMenuBox(
         expanded = specializationExpanded,
@@ -429,12 +459,15 @@ fun PersonalDetailsForm(
             value = specialization,
             onValueChange = onSpecializationChange,
             label = { Text("Specialization") },
+            leadingIcon = { Icon(Icons.Default.MedicalServices, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             isError = specializationError != null,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = specializationExpanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                 .fillMaxWidth(),
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            shape = RoundedCornerShape(16.dp),
+            singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
         )
@@ -459,12 +492,15 @@ fun PersonalDetailsForm(
             value = qualification,
             onValueChange = onQualificationChange,
             label = { Text("Qualification") },
+            leadingIcon = { Icon(Icons.Default.School, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             isError = qualificationError != null,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = qualificationExpanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                 .fillMaxWidth(),
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            shape = RoundedCornerShape(16.dp),
+            singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
         )
@@ -484,19 +520,22 @@ fun PersonalDetailsForm(
         ExposedDropdownMenuBox(
             expanded = experienceExpanded,
             onExpandedChange = { experienceExpanded = it },
-            modifier = Modifier.weight(1.6f)
+            modifier = Modifier.weight(2f)
         ) {
             OutlinedTextField(
                 value = experience,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Experience") },
+                label = { Text("Exp. (Yrs)", maxLines = 1) },
+                leadingIcon = { Icon(Icons.Default.Work, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                 isError = experienceError != null,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = experienceExpanded) },
                 modifier = Modifier
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                     .fillMaxWidth(),
                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                shape = RoundedCornerShape(16.dp),
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Next) })
             )
@@ -517,6 +556,7 @@ fun PersonalDetailsForm(
             isError = consultationFeeError != null,
             modifier = Modifier.weight(1f),
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Next
@@ -529,8 +569,11 @@ fun PersonalDetailsForm(
         value = clinicAddress,
         onValueChange = onClinicAddressChange,
         label = { Text("Clinic Address") },
+        leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
         isError = clinicAddressError != null,
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
     )
@@ -541,6 +584,7 @@ fun PersonalDetailsForm(
         label = { Text("About Yourself") },
         isError = aboutError != null,
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         minLines = 3,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
@@ -567,8 +611,20 @@ fun AvailabilityForm(
     showTimePicker?.let { (dayKey, index, isStart) ->
         val timePickerState = rememberTimePickerState()
         Dialog(onDismissRequest = { showTimePicker = null }) {
-            Card {
-                Column(modifier = Modifier.padding(16.dp)) {
+            Card(
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = if (isStart) "Start Time" else "End Time",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
                     TimePicker(state = timePickerState)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -578,7 +634,12 @@ fun AvailabilityForm(
                             Text("Cancel")
                         }
                         TextButton(onClick = {
-                            val newTime = String.format("%02d:%02d", timePickerState.hour, timePickerState.minute)
+                            val hour = timePickerState.hour
+                            val minute = timePickerState.minute
+                            val amPm = if (hour < 12) "AM" else "PM"
+                            val hour12 = if (hour % 12 == 0) 12 else hour % 12
+                            val newTime = String.format("%02d:%02d %s", hour12, minute, amPm)
+                            
                             val daySlots = availability[dayKey]?.toMutableList() ?: mutableListOf()
                             val currentSlot = daySlots[index]
                             val newSlot = if (isStart) {
@@ -590,7 +651,7 @@ fun AvailabilityForm(
                             onAvailabilityChange(availability + (dayKey to daySlots))
                             showTimePicker = null
                         }) {
-                            Text("OK")
+                            Text("Confirm")
                         }
                     }
                 }
@@ -600,71 +661,77 @@ fun AvailabilityForm(
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(
-            "Set your weekly availability",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
+            "Weekly Availability",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
         )
         days.forEach { (displayName, apiKey) ->
             val slots = availability[apiKey] ?: emptyList()
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        displayName,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    IconButton(onClick = {
-                        val currentSlots = slots.toMutableList()
-                        currentSlots.add(TimeSlotDto("09:00", "17:00"))
-                        onAvailabilityChange(availability + (apiKey to currentSlots))
-                    }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add slot")
-                    }
-                }
-                slots.forEachIndexed { index, slot ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                )
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TimeSlotChip(
-                            text = slot.startTime,
-                            onClick = { showTimePicker = Triple(apiKey, index, true) }
+                        Text(
+                            displayName,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Text(" - ", modifier = Modifier.padding(horizontal = 4.dp))
-                        TimeSlotChip(
-                            text = slot.endTime,
-                            onClick = { showTimePicker = Triple(apiKey, index, false) }
-                        )
-                        Spacer(Modifier.weight(1f))
                         IconButton(onClick = {
                             val currentSlots = slots.toMutableList()
-                            currentSlots.removeAt(index)
+                            currentSlots.add(TimeSlotDto("09:00 AM", "05:00 PM"))
                             onAvailabilityChange(availability + (apiKey to currentSlots))
                         }) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Remove",
-                                tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            Icon(Icons.Default.AddCircle, contentDescription = "Add slot", tint = MaterialTheme.colorScheme.primary)
                         }
                     }
+                    slots.forEachIndexed { index, slot ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        ) {
+                            TimeSlotChip(
+                                text = slot.startTime,
+                                onClick = { showTimePicker = Triple(apiKey, index, true) }
+                            )
+                            Text(" to ", modifier = Modifier.padding(horizontal = 8.dp), style = MaterialTheme.typography.bodySmall)
+                            TimeSlotChip(
+                                text = slot.endTime,
+                                onClick = { showTimePicker = Triple(apiKey, index, false) }
+                            )
+                            Spacer(Modifier.weight(1f))
+                            IconButton(onClick = {
+                                val currentSlots = slots.toMutableList()
+                                currentSlots.removeAt(index)
+                                onAvailabilityChange(availability + (apiKey to currentSlots))
+                            }) {
+                                Icon(
+                                    Icons.Default.DeleteOutline,
+                                    contentDescription = "Remove",
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    }
+                    if (slots.isEmpty()) {
+                        Text(
+                            "Not available",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
                 }
-                if (slots.isEmpty()) {
-                    Text(
-                        "No slots added",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                HorizontalDivider(
-                    modifier = Modifier.padding(top = 8.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                )
             }
         }
     }
@@ -674,15 +741,17 @@ fun AvailabilityForm(
 fun TimeSlotChip(text: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        modifier = Modifier.width(80.dp)
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier.width(90.dp)
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(vertical = 8.dp),
+            modifier = Modifier.padding(vertical = 10.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = FontWeight.Bold
         )
     }
 }
