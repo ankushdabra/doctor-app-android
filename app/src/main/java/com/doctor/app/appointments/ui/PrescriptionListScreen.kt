@@ -8,8 +8,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EventNote
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.*
@@ -374,16 +376,17 @@ private fun PrescriptionItemCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = if (!isSystemInDarkTheme()) CardDefaults.outlinedCardBorder() else null
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(20.dp)
                 .fillMaxWidth()
         ) {
             Row(
@@ -391,105 +394,141 @@ private fun PrescriptionItemCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    modifier = Modifier.size(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+                    modifier = Modifier.size(52.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
 
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(16.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = prescription.patientName,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Text(
-                        text = "Appointment: ${prescription.appointmentDate}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.EventNote,
+                            contentDescription = null,
+                            modifier = Modifier.size(12.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = "Visit: ${prescription.appointmentDate}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                
+                IconButton(onClick = { /* View details */ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Description,
+                        contentDescription = "View details",
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(20.dp))
 
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 0.5.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Medication,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Prescribed Medications",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
 
-            Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(8.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Medication,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "Medications",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+                    Text(
+                        text = prescription.medications,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.SemiBold,
+                        lineHeight = 20.sp
+                    )
 
-            Spacer(Modifier.height(4.dp))
-
-            Text(
-                text = prescription.medications,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Medium
-            )
-
-            if (prescription.instructions.isNotBlank()) {
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = "Instructions",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = prescription.instructions,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    if (prescription.instructions.isNotBlank()) {
+                        Spacer(Modifier.height(12.dp))
+                        HorizontalDivider(
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        
+                        Text(
+                            text = "INSTRUCTIONS",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            letterSpacing = 1.sp
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = prescription.instructions,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
             }
 
             if (prescription.notes.isNotBlank()) {
                 Spacer(Modifier.height(12.dp))
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Column(modifier = Modifier.padding(8.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .size(6.dp)
+                            .background(MaterialTheme.colorScheme.secondary, CircleShape)
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column {
                         Text(
-                            text = "Notes",
+                            text = "Doctor's Notes",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
                             text = prescription.notes,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                         )
                     }
                 }
@@ -504,9 +543,9 @@ fun PrescriptionListScreenPreview() {
     val mockPrescriptions = listOf(
         PrescriptionDto(
             id = "1",
-            medications = "Paracetamol 500mg, Twice a day",
-            instructions = "Take after meals",
-            notes = "Mild fever",
+            medications = "Paracetamol 500mg (2x/day), Cetirizine 10mg (Nightly)",
+            instructions = "Take Paracetamol after meals. Cetirizine should be taken before sleep for 5 days.",
+            notes = "Patient has high fever and runny nose. Advised warm fluids.",
             prescriptionDate = LocalDate.now().toString(),
             appointmentId = "a1",
             appointmentDate = "2024-08-15",
@@ -516,8 +555,8 @@ fun PrescriptionListScreenPreview() {
         PrescriptionDto(
             id = "2",
             medications = "Aspirin 75mg, Once daily",
-            instructions = "Take in the morning",
-            notes = "Regular checkup",
+            instructions = "Take in the morning after breakfast.",
+            notes = "Regular cardiovascular checkup.",
             prescriptionDate = LocalDate.now().minusDays(1).toString(),
             appointmentId = "a2",
             appointmentDate = "2024-08-14",
@@ -526,7 +565,9 @@ fun PrescriptionListScreenPreview() {
         )
     )
     HealthcareTheme {
-        PrescriptionListContent(mockPrescriptions)
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            PrescriptionListContent(mockPrescriptions)
+        }
     }
 }
 
