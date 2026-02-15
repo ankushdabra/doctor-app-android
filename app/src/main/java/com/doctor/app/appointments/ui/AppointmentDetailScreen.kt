@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
@@ -34,6 +36,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -68,198 +71,214 @@ fun AppointmentDetailScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding())
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            DetailHeader(
-                appointment = appointment
-            )
-
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 24.dp),
+                    .fillMaxSize()
+                    .padding(bottom = innerPadding.calculateBottomPadding())
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Patient Metrics Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                DetailHeader(
+                    appointment = appointment
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Patient Metrics",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Icon(
-                                imageVector = Icons.Outlined.MonitorHeart,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                            )
-                        }
-                        
-                        Spacer(Modifier.height(24.dp))
-                        
-                        Row(
-                            modifier = Modifier.fillMaxWidth(), 
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            MetricBox(
-                                modifier = Modifier.weight(1f),
-                                label = "Age",
-                                value = "${appointment.patient.age ?: "N/A"}",
-                                unit = "years",
-                                icon = Icons.Outlined.Badge,
-                                color = Color(0xFF64B5F6)
-                            )
-                            MetricBox(
-                                modifier = Modifier.weight(1f),
-                                label = "Blood",
-                                value = appointment.patient.bloodGroup ?: "N/A",
-                                unit = "group",
-                                icon = Icons.Outlined.WaterDrop,
-                                color = Color(0xFFE57373)
-                            )
-                        }
-                        
-                        Spacer(Modifier.height(12.dp))
-                        
-                        Row(
-                            modifier = Modifier.fillMaxWidth(), 
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            MetricBox(
-                                modifier = Modifier.weight(1f),
-                                label = "Weight",
-                                value = "72", 
-                                unit = "kg",
-                                icon = Icons.Outlined.Scale,
-                                color = Color(0xFF81C784)
-                            )
-                            MetricBox(
-                                modifier = Modifier.weight(1f),
-                                label = "Height",
-                                value = "175", 
-                                unit = "cm",
-                                icon = Icons.Outlined.Straighten,
-                                color = Color(0xFFFFB74D)
-                            )
-                        }
-                        
-                        Spacer(Modifier.height(24.dp))
-                        
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(20.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        ) {
+                    // Patient Metrics Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(32.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(24.dp)) {
                             Row(
-                                modifier = Modifier.padding(16.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
-                                    contentAlignment = Alignment.Center
+                                Text(
+                                    text = "Patient Metrics",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Icon(
+                                    imageVector = Icons.Outlined.MonitorHeart,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                )
+                            }
+                            
+                            Spacer(Modifier.height(24.dp))
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(), 
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                MetricBox(
+                                    modifier = Modifier.weight(1f),
+                                    label = "Age",
+                                    value = "${appointment.patient.age ?: "N/A"}",
+                                    unit = "years",
+                                    icon = Icons.Outlined.Badge,
+                                    color = Color(0xFF64B5F6)
+                                )
+                                MetricBox(
+                                    modifier = Modifier.weight(1f),
+                                    label = "Blood",
+                                    value = appointment.patient.bloodGroup ?: "N/A",
+                                    unit = "group",
+                                    icon = Icons.Outlined.WaterDrop,
+                                    color = Color(0xFFE57373)
+                                )
+                            }
+                            
+                            Spacer(Modifier.height(12.dp))
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(), 
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                MetricBox(
+                                    modifier = Modifier.weight(1f),
+                                    label = "Weight",
+                                    value = "72", 
+                                    unit = "kg",
+                                    icon = Icons.Outlined.Scale,
+                                    color = Color(0xFF81C784)
+                                )
+                                MetricBox(
+                                    modifier = Modifier.weight(1f),
+                                    label = "Height",
+                                    value = "175", 
+                                    unit = "cm",
+                                    icon = Icons.Outlined.Straighten,
+                                    color = Color(0xFFFFB74D)
+                                )
+                            }
+                            
+                            Spacer(Modifier.height(24.dp))
+                            
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(20.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Email,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp),
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                                Spacer(Modifier.width(16.dp))
-                                Column {
-                                    Text(
-                                        text = "Contact Email",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        text = appointment.patient.email,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Email,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(20.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    Spacer(Modifier.width(16.dp))
+                                    Column {
+                                        Text(
+                                            text = "Contact Email",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = appointment.patient.email,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                
-                Spacer(Modifier.height(24.dp))
-                
-                Button(
-                    onClick = { /* Handle Start Consultation */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-                ) {
-                    Text(
-                        text = "Start Consultation", 
-                        fontSize = 18.sp, 
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                }
-                
-                Spacer(Modifier.height(16.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(), 
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Button(
-                        onClick = { /* Handle Reschedule */ },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    ) {
-                        Text("Reschedule", fontWeight = FontWeight.Bold)
-                    }
+                    
+                    Spacer(Modifier.height(24.dp))
                     
                     Button(
-                        onClick = { /* Handle Cancel */ },
+                        onClick = { /* Handle Start Consultation */ },
                         modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isDark) Color(0xFF422222) else Color(0xFFFFEBEE),
-                            contentColor = if (isDark) Color(0xFFFFB4B4) else Color(0xFFD32F2F)
-                        )
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
-                        Text("Cancel", fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Start Consultation", 
+                            fontSize = 18.sp, 
+                            fontWeight = FontWeight.ExtraBold
+                        )
                     }
+                    
+                    Spacer(Modifier.height(16.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), 
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            onClick = { /* Handle Reschedule */ },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        ) {
+                            Text("Reschedule", fontWeight = FontWeight.Bold)
+                        }
+                        
+                        Button(
+                            onClick = { /* Handle Cancel */ },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (isDark) Color(0xFF422222) else Color(0xFFFFEBEE),
+                                contentColor = if (isDark) Color(0xFFFFB4B4) else Color(0xFFD32F2F)
+                            )
+                        ) {
+                            Text("Cancel", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                    
+                    Spacer(Modifier.height(32.dp))
                 }
-                
-                Spacer(Modifier.height(32.dp))
+            }
+
+            // Fixed Back Button
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(start = 8.dp, top = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
             }
         }
     }
