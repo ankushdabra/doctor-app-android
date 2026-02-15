@@ -2,7 +2,6 @@ package com.doctor.app.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,11 +36,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -50,10 +50,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.appointments.api.AppointmentRepository
 import com.doctor.app.appointments.api.PatientDto
+import com.doctor.app.appointments.api.TodaysAppointmentsResponse
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.theme.EarningsAccentDark
@@ -91,13 +94,13 @@ import java.util.Calendar
 @Composable
 fun HomeScreen(
     doctor: UserDto,
-    uiState: UiState<List<AppointmentDto>>,
+    uiState: UiState<TodaysAppointmentsResponse>,
     onViewAllClick: () -> Unit = {},
     onAppointmentClick: (AppointmentDto) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 32.dp),
+        contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {
@@ -107,7 +110,9 @@ fun HomeScreen(
         item {
             when (val state = uiState) {
                 is UiState.Success -> {
-                    val nextAppointment = state.data.firstOrNull { it.status == "BOOKED" }
+                    val nextAppointment = remember(state.data.appointments) {
+                        state.data.appointments.firstOrNull { it.status == "BOOKED" }
+                    }
                     if (nextAppointment != null) {
                         NextAppointmentHighlight(nextAppointment, onAppointmentClick)
                     } else {
@@ -133,9 +138,16 @@ fun HomeScreen(
         
         item {
             when (val state = uiState) {
-                is UiState.Success -> AppointmentsRow(state.data, onAppointmentClick)
-                is UiState.Loading -> Box(Modifier.fillMaxWidth(), Alignment.Center) { CircularProgressIndicator() }
-                is UiState.Error -> Text("Failed to load schedule", modifier = Modifier.padding(20.dp))
+                is UiState.Success -> AppointmentsRow(state.data.appointments, onAppointmentClick)
+                is UiState.Loading -> Box(Modifier.fillMaxWidth().height(120.dp), Alignment.Center) { 
+                    CircularProgressIndicator(strokeWidth = 3.dp) 
+                }
+                is UiState.Error -> Text(
+                    text = "Failed to load schedule", 
+                    modifier = Modifier.padding(20.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
     }
@@ -147,14 +159,14 @@ fun HomeScreen(
     onViewAllClick: () -> Unit = {},
     onAppointmentClick: (AppointmentDto) -> Unit = {}
 ) {
-    val repository = AppointmentRepository(tokenManager)
-    val viewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(repository)
-    )
-    val uiState by viewModel.uiState.collectAsState()
+    val repository = remember(tokenManager) { AppointmentRepository(tokenManager) }
+    val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(repository))
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val doctor by tokenManager.userDetails.collectAsStateWithLifecycle(initialValue = null)
     
-    // Collect doctor profile from cache
-    val doctor by tokenManager.userDetails.collectAsState(initial = null)
+    LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
     
     if (doctor != null) {
         HomeScreen(
@@ -164,16 +176,15 @@ fun HomeScreen(
             onAppointmentClick = onAppointmentClick
         )
     } else {
-        // Fallback loading state while cache is being read
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(strokeWidth = 3.dp)
         }
     }
 }
 
 @Composable
 private fun HeaderSection(name: String) {
-    val displayName = if (name.startsWith("Dr.", ignoreCase = true)) name else "Dr. $name"
+    val displayName = remember(name) { if (name.startsWith("Dr.", ignoreCase = true)) name else "Dr. $name" }
     val salutation = remember {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         when (hour) {
@@ -186,13 +197,13 @@ private fun HeaderSection(name: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Surface(
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier.size(52.dp),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primaryContainer
             ) {
@@ -205,17 +216,17 @@ private fun HeaderSection(name: String) {
                     )
                 }
             }
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(16.dp))
             Column {
                 Text(
-                    text = "$salutation,",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = salutation,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = displayName,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -235,14 +246,14 @@ private fun NextAppointmentHighlight(
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
         shape = RoundedCornerShape(28.dp),
-        elevation = CardDefaults.cardElevation(12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
+                        colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.9f)),
                         start = Offset(0f, 0f),
                         end = Offset(1000f, 1000f)
                     )
@@ -261,7 +272,7 @@ private fun NextAppointmentHighlight(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Surface(
                             color = contentColor.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(8.dp)
@@ -271,7 +282,8 @@ private fun NextAppointmentHighlight(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = contentColor,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 0.5.sp
                             )
                         }
                         Spacer(Modifier.height(12.dp))
@@ -283,13 +295,13 @@ private fun NextAppointmentHighlight(
                         )
                         Text(
                             text = "Scheduled Appointment",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             color = contentColor.copy(alpha = 0.8f)
                         )
                     }
                     
                     Surface(
-                        modifier = Modifier.size(60.dp),
+                        modifier = Modifier.size(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         color = Color.White.copy(alpha = 0.15f)
                     ) {
@@ -298,7 +310,7 @@ private fun NextAppointmentHighlight(
                                 imageVector = Icons.Default.Badge, 
                                 contentDescription = null, 
                                 tint = contentColor, 
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(28.dp)
                             )
                         }
                     }
@@ -316,13 +328,14 @@ private fun NextAppointmentHighlight(
                             imageVector = Icons.Outlined.Timer, 
                             contentDescription = null, 
                             tint = contentColor, 
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
                             text = appointment.appointmentTime, 
-                            style = MaterialTheme.typography.bodyMedium, 
-                            color = contentColor
+                            style = MaterialTheme.typography.labelLarge, 
+                            color = contentColor,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                     
@@ -332,9 +345,10 @@ private fun NextAppointmentHighlight(
                             containerColor = contentColor, 
                             contentColor = PrimaryLight
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
                     ) {
-                        Text("Start Now", fontWeight = FontWeight.Bold)
+                        Text("Start Now", fontWeight = FontWeight.Black, fontSize = 14.sp)
                     }
                 }
             }
@@ -343,9 +357,29 @@ private fun NextAppointmentHighlight(
 }
 
 @Composable
-private fun StatsGrid(uiState: UiState<List<AppointmentDto>>) {
+private fun StatsGrid(uiState: UiState<TodaysAppointmentsResponse>) {
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-    val count = if (uiState is UiState.Success) uiState.data.size.toString() else "--"
+    
+    val patientCount = remember(uiState) {
+        if (uiState is UiState.Success) uiState.data.appointments.size.toString() else "--"
+    }
+    
+    val earningsValue = remember(uiState) {
+        when (val state = uiState) {
+            is UiState.Success -> {
+                val earnings = state.data.totalEarnings
+                if (earnings >= 1000) {
+                    val kValue = earnings / 1000.0
+                    val formatted = String.format("%.1f", kValue)
+                    "₹${if (formatted.endsWith(".0")) formatted.substringBefore(".0") else formatted}k"
+                } else {
+                    "₹${earnings.toInt()}"
+                }
+            }
+            is UiState.Loading -> "..."
+            is UiState.Error -> "Err"
+        }
+    }
     
     Row(
         modifier = Modifier
@@ -356,15 +390,15 @@ private fun StatsGrid(uiState: UiState<List<AppointmentDto>>) {
         StatCardEnhanced(
             modifier = Modifier.weight(1f),
             title = "Patients Today",
-            value = count,
+            value = patientCount,
             icon = Icons.Outlined.Group,
             containerColor = if (isDark) PatientsTodayCardDark else PatientsTodayCardLight,
             accentColor = if (isDark) PatientsTodayAccentDark else PatientsTodayAccentLight
         )
         StatCardEnhanced(
             modifier = Modifier.weight(1f),
-            title = "Total Earnings",
-            value = "₹8.4k",
+            title = "Today's Earnings",
+            value = earningsValue,
             icon = Icons.Outlined.History,
             containerColor = if (isDark) EarningsCardDark else EarningsCardLight,
             accentColor = if (isDark) EarningsAccentDark else EarningsAccentLight
@@ -390,7 +424,7 @@ private fun StatCardEnhanced(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(accentColor.copy(alpha = 0.15f), CircleShape),
+                    .background(accentColor.copy(alpha = 0.12f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -404,13 +438,14 @@ private fun StatCardEnhanced(
             Text(
                 text = value, 
                 style = MaterialTheme.typography.headlineSmall, 
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Black,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = title, 
                 style = MaterialTheme.typography.labelSmall, 
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -422,36 +457,28 @@ private fun AppointmentsRow(
     onAppointmentClick: (AppointmentDto) -> Unit
 ) {
     if (appointments.isEmpty()) {
-        Text("No appointments for today", modifier = Modifier.padding(20.dp))
+        Box(Modifier.fillMaxWidth().height(100.dp).padding(horizontal = 20.dp), contentAlignment = Alignment.CenterStart) {
+            Text("No appointments for today", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
         return
     }
 
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     
-    val colorSchemes = listOf(
-        Pair(
-            if (isDark) ScheduleAmberDark else ScheduleAmberLight,
-            if (isDark) ScheduleAmberAccentDark else ScheduleAmberAccentLight
-        ),
-        Pair(
-            if (isDark) SchedulePurpleDark else SchedulePurpleLight,
-            if (isDark) SchedulePurpleAccentDark else SchedulePurpleAccentLight
-        ),
-        Pair(
-            if (isDark) ScheduleTealDark else ScheduleTealLight,
-            if (isDark) ScheduleTealAccentDark else ScheduleTealAccentLight
-        ),
-        Pair(
-            if (isDark) ScheduleRoseDark else ScheduleRoseLight,
-            if (isDark) ScheduleRoseAccentDark else ScheduleRoseAccentLight
+    val colorSchemes = remember(isDark) {
+        listOf(
+            Pair(if (isDark) ScheduleAmberDark else ScheduleAmberLight, if (isDark) ScheduleAmberAccentDark else ScheduleAmberAccentLight),
+            Pair(if (isDark) SchedulePurpleDark else SchedulePurpleLight, if (isDark) SchedulePurpleAccentDark else SchedulePurpleAccentLight),
+            Pair(if (isDark) ScheduleTealDark else ScheduleTealLight, if (isDark) ScheduleTealAccentDark else ScheduleTealAccentLight),
+            Pair(if (isDark) ScheduleRoseDark else ScheduleRoseLight, if (isDark) ScheduleRoseAccentDark else ScheduleRoseAccentLight)
         )
-    )
+    }
 
     LazyRow(
         contentPadding = PaddingValues(horizontal = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        itemsIndexed(appointments) { index, appointment ->
+        itemsIndexed(appointments, key = { _, item -> item.id }) { index, appointment ->
             val colorScheme = colorSchemes[index % colorSchemes.size]
             AppointmentSmallCard(
                 appointment = appointment, 
@@ -473,6 +500,7 @@ private fun AppointmentSmallCard(
     Card(
         modifier = Modifier
             .width(160.dp)
+            .clip(RoundedCornerShape(20.dp))
             .clickable { onClick(appointment) },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor)
@@ -487,7 +515,8 @@ private fun AppointmentSmallCard(
                     Icon(
                         imageVector = Icons.Default.Person, 
                         contentDescription = null, 
-                        tint = accentColor
+                        tint = accentColor,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -496,13 +525,14 @@ private fun AppointmentSmallCard(
                 text = appointment.patient.name, 
                 fontWeight = FontWeight.Bold, 
                 maxLines = 1,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = appointment.appointmentTime, 
                 style = MaterialTheme.typography.labelSmall, 
                 color = accentColor,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Black
             )
         }
     }
@@ -515,34 +545,60 @@ private fun SectionHeader(title: String, actionText: String, onActionClick: () -
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black)
         Text(
             text = actionText,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.clickable { onActionClick() }
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.clip(RoundedCornerShape(4.dp)).clickable { onActionClick() }.padding(4.dp)
         )
     }
 }
 
 @Composable
 private fun LoadingCard() {
-    Card(modifier = Modifier.fillMaxWidth().height(150.dp).padding(horizontal = 20.dp), shape = RoundedCornerShape(28.dp)) {
-        Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }
+    Card(
+        modifier = Modifier.fillMaxWidth().height(160.dp).padding(horizontal = 20.dp), 
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+    ) {
+        Box(Modifier.fillMaxSize(), Alignment.Center) { 
+            CircularProgressIndicator(strokeWidth = 3.dp) 
+        }
     }
 }
 
 @Composable
 private fun ErrorCard(msg: String) {
-    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp), shape = RoundedCornerShape(28.dp)) {
-        Text(msg, modifier = Modifier.padding(24.dp))
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp), 
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f))
+    ) {
+        Text(
+            text = msg, 
+            modifier = Modifier.padding(24.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error
+        )
     }
 }
 
 @Composable
 private fun NoAppointmentsCard() {
-    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp), shape = RoundedCornerShape(28.dp)) {
-        Text("No appointments scheduled for today", modifier = Modifier.padding(24.dp))
+    Card(
+        modifier = Modifier.fillMaxWidth().height(160.dp).padding(horizontal = 20.dp), 
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+    ) {
+        Box(Modifier.fillMaxSize(), Alignment.Center) {
+            Text(
+                text = "No appointments scheduled for today", 
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -563,36 +619,17 @@ fun HomeScreenPreview() {
             appointmentDate = "Today",
             appointmentTime = "10:30 AM",
             status = "BOOKED"
-        ),
-        AppointmentDto(
-            id = "2",
-            doctor = mockDoctor,
-            patient = PatientDto("2", "Alice Smith", "alice@gmail.com", "PATIENT", 24, "Female", "A-"),
-            appointmentDate = "Today",
-            appointmentTime = "11:15 AM",
-            status = "BOOKED"
-        ),
-        AppointmentDto(
-            id = "3",
-            doctor = mockDoctor,
-            patient = PatientDto("3", "John Doe", "john@gmail.com", "PATIENT", 45, "Male", "B+"),
-            appointmentDate = "Today",
-            appointmentTime = "12:00 PM",
-            status = "BOOKED"
-        ),
-        AppointmentDto(
-            id = "4",
-            doctor = mockDoctor,
-            patient = PatientDto("4", "Priya Singh", "priya@gmail.com", "PATIENT", 32, "Female", "O-"),
-            appointmentDate = "Today",
-            appointmentTime = "02:30 PM",
-            status = "BOOKED"
         )
     )
     HealthcareTheme {
         HomeScreen(
             doctor = mockDoctor,
-            uiState = UiState.Success(mockAppointments)
+            uiState = UiState.Success(
+                TodaysAppointmentsResponse(
+                    appointments = mockAppointments,
+                    totalEarnings = 1400.0
+                )
+            )
         )
     }
 }

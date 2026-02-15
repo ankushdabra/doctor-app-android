@@ -2,6 +2,11 @@ package com.doctor.app.appointments.api
 
 import com.doctor.app.login.api.UserDto
 
+data class TodaysAppointmentsResponse(
+    val appointments: List<AppointmentDto>,
+    val totalEarnings: Double
+)
+
 data class AppointmentDto(
     val id: String,
     val doctor: UserDto,

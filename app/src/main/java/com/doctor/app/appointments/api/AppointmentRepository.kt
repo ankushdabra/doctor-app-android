@@ -22,7 +22,7 @@ class AppointmentRepository(private val tokenManager: TokenManager) {
         }
     }
 
-    suspend fun getTodaysAppointments(): Result<List<AppointmentDto>> {
+    suspend fun getTodaysAppointments(): Result<TodaysAppointmentsResponse> {
         return try {
             val response = api.getTodaysAppointments()
             Result.success(response)
