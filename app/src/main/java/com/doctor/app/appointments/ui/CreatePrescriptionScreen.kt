@@ -57,7 +57,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -65,10 +64,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.doctor.app.appointments.api.AppointmentDto
-import com.doctor.app.appointments.api.AppointmentRepository
 import com.doctor.app.appointments.api.PatientDto
 import com.doctor.app.appointments.viewmodel.PrescriptionViewModel
-import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.core.ui.theme.PrimaryLight
@@ -113,7 +110,7 @@ fun CreatePrescriptionContent(
     var medications by remember { mutableStateOf("") }
     var instructions by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
-    
+
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
 
@@ -124,9 +121,11 @@ fun CreatePrescriptionContent(
                     onPrescriptionCreated()
                 }
             }
+
             is UiState.Error -> {
                 snackbarHostState.showSnackbar(uiState.message)
             }
+
             else -> {}
         }
     }
@@ -194,7 +193,7 @@ fun CreatePrescriptionContent(
                         icon = Icons.AutoMirrored.Filled.Notes,
                         imeAction = ImeAction.Done,
                         keyboardActions = KeyboardActions(
-                            onDone = { 
+                            onDone = {
                                 focusManager.clearFocus()
                                 if (medications.isNotBlank()) {
                                     onSubmit(medications, instructions, notes)
@@ -363,25 +362,37 @@ private fun PrescriptionInputCard(
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun CreatePrescriptionScreenPreview() {
     val appointment = AppointmentDto(
         id = "1",
-        doctor = UserDto(id = "d1", name = "Dr. Smith", email = "smith@example.com", role = "DOCTOR"),
-        patient = PatientDto(id = "p1", name = "John Doe", email = "john@example.com", role = "PATIENT"),
+        doctor = UserDto(
+            id = "d1",
+            name = "Dr. Smith",
+            email = "smith@example.com",
+            role = "DOCTOR"
+        ),
+        patient = PatientDto(
+            id = "p1",
+            name = "John Doe",
+            email = "john@example.com",
+            role = "PATIENT"
+        ),
         appointmentDate = "2024-08-15",
         appointmentTime = "10:00 AM",
         status = "Confirmed"
     )
-    
+
     HealthcareTheme {
-        CreatePrescriptionScreen(
+        // Use CreatePrescriptionContent directly in Preview to avoid NoClassDefFoundError
+        // related to OkHttp/Conscrypt initialization when creating a real ViewModel/Repository.
+        CreatePrescriptionContent(
             appointment = appointment,
-            viewModel = PrescriptionViewModel(AppointmentRepository(TokenManager(LocalContext.current))),
+            uiState = UiState.Success(false),
             onBackClick = {},
-            onPrescriptionCreated = {}
+            onPrescriptionCreated = {},
+            onSubmit = { _, _, _ -> }
         )
     }
 }

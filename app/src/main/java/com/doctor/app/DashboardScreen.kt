@@ -50,6 +50,7 @@ import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.appointments.api.AppointmentRepository
 import com.doctor.app.appointments.ui.AppointmentDetailScreen
 import com.doctor.app.appointments.ui.AppointmentListScreen
+import com.doctor.app.appointments.ui.PrescriptionListScreen
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.home.ui.HomeScreen
@@ -208,15 +209,9 @@ fun DashboardScreen(
                             }
 
                             DashboardTab.Patients -> {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        "Patient Records",
-                                        style = MaterialTheme.typography.headlineMedium
-                                    )
-                                }
+                                PrescriptionListScreen(
+                                    tokenManager = tokenManager
+                                )
                             }
 
                             DashboardTab.Profile -> {

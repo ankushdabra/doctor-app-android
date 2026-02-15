@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.doctor.app.appointments.api.AppointmentRepository
+import com.doctor.app.appointments.api.PrescriptionDto
 import com.doctor.app.appointments.api.PrescriptionRequestDto
 import com.doctor.app.core.ui.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,9 @@ class PrescriptionViewModel(
 
     private val _uiState = MutableStateFlow<UiState<Boolean>>(UiState.Success(false))
     val uiState = _uiState.asStateFlow()
+
+    private val _prescriptionsState = MutableStateFlow<UiState<List<PrescriptionDto>>>(UiState.Loading)
+    val prescriptionsState = _prescriptionsState.asStateFlow()
 
     fun createPrescription(
         patientId: String,
@@ -45,6 +49,23 @@ class PrescriptionViewModel(
                 }
             } catch (e: Exception) {
                 _uiState.value = UiState.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    fun loadPrescriptions() {
+        viewModelScope.launch {
+            _prescriptionsState.value = UiState.Loading
+            try {
+                val result = repository.getPrescriptions()
+                if (result.isSuccess) {
+                    _prescriptionsState.value = UiState.Success(result.getOrNull() ?: emptyList())
+                } else {
+                    _prescriptionsState.value =
+                        UiState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
+                }
+            } catch (e: Exception) {
+                _prescriptionsState.value = UiState.Error(e.message ?: "Unknown error")
             }
         }
     }

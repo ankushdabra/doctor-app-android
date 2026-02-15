@@ -38,4 +38,13 @@ class AppointmentRepository(tokenManager: TokenManager) {
             Result.failure(e)
         }
     }
+
+    suspend fun getPrescriptions(): Result<List<PrescriptionDto>> {
+        return try {
+            val response = api.getPrescriptions()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
