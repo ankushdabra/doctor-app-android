@@ -381,7 +381,7 @@ private fun PrescriptionItemCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         border = if (!isSystemInDarkTheme()) CardDefaults.outlinedCardBorder() else null
     ) {
         Column(
