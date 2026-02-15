@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.login.api.AuthenticationRepository
+import com.doctor.app.login.api.DoctorDetailsDto
+import com.doctor.app.login.api.TimeSlotDto
 import com.doctor.app.login.api.UserDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,6 +22,8 @@ class ProfileViewModel(
 ) : ViewModel() {
 
     private val _refreshError = MutableStateFlow<String?>(null)
+    private val _updateState = MutableStateFlow<UiState<Unit>>(UiState.Success(Unit))
+    val updateState: StateFlow<UiState<Unit>> = _updateState
 
     // Cleaned up UI State: It now prioritizes the local cache (TokenManager)
     // and only shows loading/error states when no cached data is available.
@@ -54,6 +58,34 @@ class ProfileViewModel(
                 }
                 .onFailure { error ->
                     _refreshError.value = error.message ?: "Failed to load profile"
+                }
+        }
+    }
+
+    fun updateDoctorDetails(details: DoctorDetailsDto) {
+        viewModelScope.launch {
+            _updateState.value = UiState.Loading
+            repository.updateDoctorDetails(details)
+                .onSuccess {
+                    _updateState.value = UiState.Success(Unit)
+                    loadProfile() // Refresh profile to get updated details
+                }
+                .onFailure { error ->
+                    _updateState.value = UiState.Error(error.message ?: "Failed to update professional details")
+                }
+        }
+    }
+
+    fun updateAvailability(availability: Map<String, List<TimeSlotDto>>) {
+        viewModelScope.launch {
+            _updateState.value = UiState.Loading
+            repository.updateAvailability(availability)
+                .onSuccess {
+                    _updateState.value = UiState.Success(Unit)
+                    loadProfile() // Refresh profile to get updated slots
+                }
+                .onFailure { error ->
+                    _updateState.value = UiState.Error(error.message ?: "Failed to update availability")
                 }
         }
     }
