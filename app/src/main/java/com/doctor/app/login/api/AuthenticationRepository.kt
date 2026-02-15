@@ -50,6 +50,19 @@ class AuthenticationRepository(private val tokenManager: TokenManager) {
         }
     }
 
+    suspend fun updateProfile(request: ProfileUpdateRequestDto): Result<Unit> {
+        return try {
+            val response = api.updateProfile(request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to update profile"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun updateDoctorDetails(details: DoctorDetailsDto): Result<Unit> {
         return try {
             val response = api.updateDoctorDetails(details)

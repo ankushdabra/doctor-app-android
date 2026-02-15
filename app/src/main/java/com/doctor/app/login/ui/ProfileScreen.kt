@@ -90,6 +90,7 @@ import com.doctor.app.core.ui.theme.PrimaryLight
 import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.api.DoctorDetailsDto
+import com.doctor.app.login.api.ProfileUpdateRequestDto
 import com.doctor.app.login.api.TimeSlotDto
 import com.doctor.app.login.api.UserDto
 import com.doctor.app.login.viewmodel.ProfileViewModel
@@ -130,7 +131,7 @@ fun ProfileScreen(
                 themeMode = themeMode,
                 updateState = updateState,
                 onThemeChange = viewModel::setThemeMode,
-                onUpdateProfile = viewModel::updateFullProfile,
+                onUpdateProfile = viewModel::updateProfile,
                 onLogoutClick = viewModel::logout
             )
         } else {
@@ -147,7 +148,7 @@ fun ProfileScreen(
                         themeMode = themeMode,
                         updateState = updateState,
                         onThemeChange = viewModel::setThemeMode,
-                        onUpdateProfile = viewModel::updateFullProfile,
+                        onUpdateProfile = viewModel::updateProfile,
                         onLogoutClick = viewModel::logout
                     )
                 }
@@ -228,7 +229,7 @@ fun ProfileContent(
     themeMode: String,
     updateState: UiState<Unit>,
     onThemeChange: (String) -> Unit,
-    onUpdateProfile: (DoctorDetailsDto, Map<String, List<TimeSlotDto>>) -> Unit,
+    onUpdateProfile: (ProfileUpdateRequestDto) -> Unit,
     onLogoutClick: () -> Unit
 ) {
     val details = user.doctorDetails
@@ -318,15 +319,12 @@ fun ProfileContent(
                             ) {
                                 Text(
                                     text = "App Settings",
-                                    modifier = Modifier.padding(
-                                        horizontal = 16.dp,
-                                        vertical = 8.dp
-                                    ),
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold
                                 )
-
+                                
                                 val options = listOf("LIGHT", "DARK", "FOLLOW_SYSTEM")
                                 val labels = listOf("Light Mode", "Dark Mode", "System Default")
                                 val icons = listOf(
@@ -361,15 +359,15 @@ fun ProfileContent(
                                         }
                                     )
                                 }
-
+                                
                                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
+                                
                                 DropdownMenuItem(
-                                    text = {
+                                    text = { 
                                         Text(
                                             text = "Sign Out",
                                             color = MaterialTheme.colorScheme.error
-                                        )
+                                        ) 
                                     },
                                     leadingIcon = {
                                         Icon(
@@ -446,9 +444,7 @@ fun ProfileContent(
                     Spacer(Modifier.height(4.dp))
 
                     Text(
-                        text = specialization.ifEmpty {
-                            details?.specialization ?: "Healthcare Professional"
-                        },
+                        text = specialization.ifEmpty { details?.specialization ?: "Healthcare Professional" },
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White.copy(alpha = 0.9f)
                     )
@@ -511,40 +507,46 @@ fun ProfileContent(
                                 value = specialization,
                                 onValueChange = { specialization = it },
                                 label = { Text("Specialization") },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true
                             )
                             OutlinedTextField(
                                 value = qualification,
                                 onValueChange = { qualification = it },
                                 label = { Text("Qualification") },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true
                             )
                             OutlinedTextField(
                                 value = experience,
                                 onValueChange = { experience = it },
                                 label = { Text("Experience (Years)") },
                                 modifier = Modifier.fillMaxWidth(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                singleLine = true
                             )
                             OutlinedTextField(
                                 value = consultationFee,
                                 onValueChange = { consultationFee = it },
                                 label = { Text("Consultation Fee") },
                                 modifier = Modifier.fillMaxWidth(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                singleLine = true
                             )
                             OutlinedTextField(
                                 value = clinicAddress,
                                 onValueChange = { clinicAddress = it },
                                 label = { Text("Clinic Address") },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                maxLines = 3
                             )
                             OutlinedTextField(
                                 value = about,
                                 onValueChange = { about = it },
                                 label = { Text("About") },
                                 modifier = Modifier.fillMaxWidth(),
-                                minLines = 3
+                                minLines = 3,
+                                maxLines = 5
                             )
                         } else {
                             ProfileDetailRow(
@@ -626,24 +628,24 @@ fun ProfileContent(
                 if (!isEditing) {
                     isEditing = true
                 } else if (updateState !is UiState.Loading) {
-                    val updatedDetails = details?.copy(
-                        specialization = specialization,
-                        qualification = qualification,
-                        experience = experience.toIntOrNull() ?: 0,
-                        consultationFee = consultationFee.toDoubleOrNull() ?: 0.0,
-                        clinicAddress = clinicAddress,
-                        about = about
-                    ) ?: DoctorDetailsDto(
-                        id = "",
+                    val updateRequest = ProfileUpdateRequestDto(
                         name = user.name,
+                        email = user.email,
+                        age = user.age,
+                        gender = user.gender,
+                        bloodGroup = user.bloodGroup,
+                        weight = user.weight,
+                        height = user.height,
                         specialization = specialization,
                         qualification = qualification,
                         experience = experience.toIntOrNull() ?: 0,
                         consultationFee = consultationFee.toDoubleOrNull() ?: 0.0,
+                        about = about,
                         clinicAddress = clinicAddress,
-                        about = about
+                        profileImage = details?.profileImage,
+                        availability = availability
                     )
-                    onUpdateProfile(updatedDetails, availability)
+                    onUpdateProfile(updateRequest)
                 }
             },
             modifier = Modifier
@@ -693,7 +695,26 @@ fun AvailabilityEditor(
 
     if (isEditable) {
         showTimePicker?.let { (dayKey, index, isStart) ->
-            val timePickerState = rememberTimePickerState()
+            val daySlots = availability[dayKey] ?: emptyList()
+            val currentSlot = daySlots.getOrNull(index)
+            
+            // Extract initial hour and minute from the existing string (e.g., "09:00")
+            val initialHour = currentSlot?.let { 
+                val time = if (isStart) it.startTime else it.endTime
+                time.split(":").getOrNull(0)?.toIntOrNull()
+            } ?: 9
+            
+            val initialMinute = currentSlot?.let {
+                val time = if (isStart) it.startTime else it.endTime
+                time.split(":").getOrNull(1)?.take(2)?.toIntOrNull()
+            } ?: 0
+
+            val timePickerState = rememberTimePickerState(
+                initialHour = initialHour,
+                initialMinute = initialMinute,
+                is24Hour = false
+            )
+            
             Dialog(onDismissRequest = { showTimePicker = null }) {
                 Card(
                     shape = RoundedCornerShape(28.dp),
@@ -720,23 +741,17 @@ fun AvailabilityEditor(
                             }
                             TextButton(onClick = {
                                 val newTime =
-                                    String.format(
-                                        Locale.getDefault(),
-                                        "%02d:%02d",
-                                        timePickerState.hour,
-                                        timePickerState.minute
-                                    )
-                                val daySlots =
-                                    availability[dayKey]?.toMutableList() ?: mutableListOf()
-                                if (index < daySlots.size) {
-                                    val currentSlot = daySlots[index]
+                                    String.format(Locale.getDefault(), "%02d:%02d", timePickerState.hour, timePickerState.minute)
+                                val updatedDaySlots = daySlots.toMutableList()
+                                if (index < updatedDaySlots.size) {
+                                    val slotToUpdate = updatedDaySlots[index]
                                     val newSlot = if (isStart) {
-                                        currentSlot.copy(startTime = newTime)
+                                        slotToUpdate.copy(startTime = newTime)
                                     } else {
-                                        currentSlot.copy(endTime = newTime)
+                                        slotToUpdate.copy(endTime = newTime)
                                     }
-                                    daySlots[index] = newSlot
-                                    onAvailabilityChange(availability + (dayKey to daySlots))
+                                    updatedDaySlots[index] = newSlot
+                                    onAvailabilityChange(availability + (dayKey to updatedDaySlots))
                                 }
                                 showTimePicker = null
                             }) {
@@ -750,8 +765,8 @@ fun AvailabilityEditor(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        val visibleDays = if (isEditable) days else days.filter { (_, apiKey) ->
-            availability[apiKey]?.isNotEmpty() == true
+        val visibleDays = if (isEditable) days else days.filter { (_, apiKey) -> 
+            availability[apiKey]?.isNotEmpty() == true 
         }
 
         if (visibleDays.isEmpty() && !isEditingInAvailability(isEditable)) {
@@ -809,7 +824,7 @@ fun AvailabilityEditor(
                                 modifier = Modifier.padding(vertical = 4.dp)
                             ) {
                                 ProfileTimeSlotChip(
-                                    text = slot.startTime,
+                                    text = formatTimeForDisplay(slot.startTime),
                                     onClick = if (isEditable) {
                                         { showTimePicker = Triple(apiKey, index, true) }
                                     } else null
@@ -821,7 +836,7 @@ fun AvailabilityEditor(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 ProfileTimeSlotChip(
-                                    text = slot.endTime,
+                                    text = formatTimeForDisplay(slot.endTime),
                                     onClick = if (isEditable) {
                                         { showTimePicker = Triple(apiKey, index, false) }
                                     } else null
@@ -854,6 +869,20 @@ fun AvailabilityEditor(
                 }
             }
         }
+    }
+}
+
+// Helper to format 24h string to AM/PM string for display
+private fun formatTimeForDisplay(time24h: String): String {
+    return try {
+        val parts = time24h.split(":")
+        val hour = parts[0].toInt()
+        val minute = parts[1].take(2).toInt()
+        val amPm = if (hour < 12) "AM" else "PM"
+        val h12 = if (hour % 12 == 0) 12 else hour % 12
+        String.format(Locale.getDefault(), "%02d:%02d %s", h12, minute, amPm)
+    } catch (e: Exception) {
+        time24h
     }
 }
 
@@ -936,10 +965,7 @@ fun ProfileScreenPreview() {
                     about = "Heart specialist with expertise in interventional cardiology.",
                     clinicAddress = "Andheri East, Mumbai",
                     availability = mapOf(
-                        "MON" to listOf(
-                            TimeSlotDto("09:00", "12:00"),
-                            TimeSlotDto("17:00", "20:00")
-                        ),
+                        "MON" to listOf(TimeSlotDto("09:00", "12:00"), TimeSlotDto("17:00", "20:00")),
                         "WED" to listOf(TimeSlotDto("10:00", "15:00"))
                     )
                 )
@@ -947,7 +973,7 @@ fun ProfileScreenPreview() {
             themeMode = "FOLLOW_SYSTEM",
             updateState = UiState.Success(Unit),
             onThemeChange = {},
-            onUpdateProfile = { _, _ -> },
+            onUpdateProfile = { _ -> },
             onLogoutClick = {}
         )
     }

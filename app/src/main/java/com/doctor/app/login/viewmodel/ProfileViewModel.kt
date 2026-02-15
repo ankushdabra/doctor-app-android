@@ -7,6 +7,7 @@ import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.api.DoctorDetailsDto
+import com.doctor.app.login.api.ProfileUpdateRequestDto
 import com.doctor.app.login.api.TimeSlotDto
 import com.doctor.app.login.api.UserDto
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,6 +59,20 @@ class ProfileViewModel(
                 }
                 .onFailure { error ->
                     _refreshError.value = error.message ?: "Failed to load profile"
+                }
+        }
+    }
+
+    fun updateProfile(request: ProfileUpdateRequestDto) {
+        viewModelScope.launch {
+            _updateState.value = UiState.Loading
+            repository.updateProfile(request)
+                .onSuccess {
+                    _updateState.value = UiState.Success(Unit)
+                    loadProfile()
+                }
+                .onFailure { error ->
+                    _updateState.value = UiState.Error(error.message ?: "Failed to update profile")
                 }
         }
     }

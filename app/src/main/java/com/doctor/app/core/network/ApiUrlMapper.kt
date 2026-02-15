@@ -8,6 +8,7 @@ import com.doctor.app.login.api.DoctorDetailsDto
 import com.doctor.app.login.api.DoctorSignUpRequestDto
 import com.doctor.app.login.api.LoginRequestDto
 import com.doctor.app.login.api.LoginResponseDto
+import com.doctor.app.login.api.ProfileUpdateRequestDto
 import com.doctor.app.login.api.SignUpResponseDto
 import com.doctor.app.login.api.TimeSlotDto
 import com.doctor.app.login.api.UserDto
@@ -30,6 +31,9 @@ interface ApiUrlMapper {
 
     @GET("/api/profile")
     suspend fun getProfile(): UserDto
+
+    @PUT("/api/profile")
+    suspend fun updateProfile(@Body request: ProfileUpdateRequestDto): Response<Unit>
 
     @PUT("/api/profile/doctor-details")
     suspend fun updateDoctorDetails(@Body details: DoctorDetailsDto): Response<Unit>
