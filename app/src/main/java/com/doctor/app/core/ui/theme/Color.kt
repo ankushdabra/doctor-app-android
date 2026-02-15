@@ -3,12 +3,12 @@ package com.doctor.app.core.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Healthcare App Colors - Primary Brand Color (Deep, Professional Blues)
-val PrimaryLight = Color(0xFF0A1F7A)
+val PrimaryLight = Color(0xFF2B57E5)
 val OnPrimaryLight = Color(0xFFFFFFFF)
 val PrimaryContainerLight = Color(0xFFDDE1FF)
 val OnPrimaryContainerLight = Color(0xFF001258)
 
-val SecondaryLight = Color(0xFF05104D)
+val SecondaryLight = Color(0xFF585D71)
 val OnSecondaryLight = Color(0xFFFFFFFF)
 val SecondaryContainerLight = Color(0xFFDCE1F9)
 val OnSecondaryContainerLight = Color(0xFF151B2C)
@@ -35,7 +35,7 @@ val TertiaryDark = Color(0xFFE2BBDC)
 val OnTertiaryDark = Color(0xFF422740)
 
 val BackgroundDark = Color(0xFF0B0D11)
-val SurfaceDark = Color(0xFF1E2129)
+val SurfaceDark = Color(0xFF2C3039)    // Brighter surface for cards (config update)
 val OnSurfaceDark = Color(0xFFE2E2E6)
 val OnBackgroundDark = Color(0xFFE2E2E6)
 
