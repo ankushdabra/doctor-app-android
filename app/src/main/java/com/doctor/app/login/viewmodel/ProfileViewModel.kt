@@ -62,6 +62,27 @@ class ProfileViewModel(
         }
     }
 
+    fun updateFullProfile(details: DoctorDetailsDto, availability: Map<String, List<TimeSlotDto>>) {
+        viewModelScope.launch {
+            _updateState.value = UiState.Loading
+            
+            val profileResult = repository.updateDoctorDetails(details)
+            val availabilityResult = repository.updateAvailability(availability)
+            
+            if (profileResult.isSuccess && availabilityResult.isSuccess) {
+                _updateState.value = UiState.Success(Unit)
+                loadProfile() // Refresh profile to get updated details
+            } else {
+                val errorMessage = when {
+                    profileResult.isFailure -> profileResult.exceptionOrNull()?.message
+                    availabilityResult.isFailure -> availabilityResult.exceptionOrNull()?.message
+                    else -> "Failed to update profile"
+                } ?: "Unknown error occurred"
+                _updateState.value = UiState.Error(errorMessage)
+            }
+        }
+    }
+
     fun updateDoctorDetails(details: DoctorDetailsDto) {
         viewModelScope.launch {
             _updateState.value = UiState.Loading
