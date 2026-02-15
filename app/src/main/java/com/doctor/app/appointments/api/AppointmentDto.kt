@@ -23,5 +23,7 @@ data class PatientDto(
     val role: String,
     val age: Int? = null,
     val gender: String? = null,
-    val bloodGroup: String? = null
+    val bloodGroup: String? = null,
+    val weight: Double? = null,
+    val height: Double? = null
 )

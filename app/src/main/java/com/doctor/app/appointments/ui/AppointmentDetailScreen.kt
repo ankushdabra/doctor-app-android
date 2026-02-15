@@ -72,6 +72,14 @@ import com.doctor.app.appointments.viewmodel.PrescriptionViewModelFactory
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.core.ui.theme.PrimaryLight
+import com.doctor.app.core.ui.theme.SchedulePurpleAccentDark
+import com.doctor.app.core.ui.theme.SchedulePurpleAccentLight
+import com.doctor.app.core.ui.theme.SchedulePurpleDark
+import com.doctor.app.core.ui.theme.SchedulePurpleLight
+import com.doctor.app.core.ui.theme.ScheduleTealAccentDark
+import com.doctor.app.core.ui.theme.ScheduleTealAccentLight
+import com.doctor.app.core.ui.theme.ScheduleTealDark
+import com.doctor.app.core.ui.theme.ScheduleTealLight
 import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.UserDto
 
@@ -144,10 +152,36 @@ fun AppointmentDetailContent(
                     appointment = appointment
                 )
 
+                // Vibrant Appointment Schedule Tiles
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .padding(top = 24.dp, bottom = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    ScheduleTile(
+                        modifier = Modifier.weight(1f),
+                        icon = Icons.Default.CalendarToday,
+                        label = "Date",
+                        value = appointment.appointmentDate,
+                        containerColor = if (isDark) ScheduleTealDark else ScheduleTealLight,
+                        contentColor = if (isDark) ScheduleTealAccentDark else ScheduleTealAccentLight
+                    )
+                    ScheduleTile(
+                        modifier = Modifier.weight(1f),
+                        icon = Icons.Default.Schedule,
+                        label = "Time",
+                        value = appointment.appointmentTime,
+                        containerColor = if (isDark) SchedulePurpleDark else SchedulePurpleLight,
+                        contentColor = if (isDark) SchedulePurpleAccentDark else SchedulePurpleAccentLight
+                    )
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 24.dp),
+                        .padding(horizontal = 12.dp, vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Patient Metrics Card
@@ -211,7 +245,7 @@ fun AppointmentDetailContent(
                                 MetricBox(
                                     modifier = Modifier.weight(1f),
                                     label = "Weight",
-                                    value = "72", 
+                                    value = "${appointment.patient.weight ?: "N/A"}", 
                                     unit = "kg",
                                     icon = Icons.Outlined.Scale,
                                     color = Color(0xFF81C784)
@@ -219,7 +253,7 @@ fun AppointmentDetailContent(
                                 MetricBox(
                                     modifier = Modifier.weight(1f),
                                     label = "Height",
-                                    value = "175", 
+                                    value = "${appointment.patient.height ?: "N/A"}", 
                                     unit = "cm",
                                     icon = Icons.Outlined.Straighten,
                                     color = Color(0xFFFFB74D)
@@ -341,6 +375,55 @@ fun AppointmentDetailContent(
                     tint = Color.White
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ScheduleTile(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    label: String,
+    value: String,
+    containerColor: Color,
+    contentColor: Color
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
+        color = containerColor.copy(alpha = 0.8f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, contentColor.copy(alpha = 0.1f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(contentColor.copy(alpha = 0.15f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = contentColor.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = if (isSystemInDarkTheme()) Color.White else contentColor
+            )
         }
     }
 }
@@ -482,63 +565,7 @@ private fun DetailHeader(
                     fontWeight = FontWeight.Bold
                 )
             }
-
-            Spacer(Modifier.height(32.dp))
-
-            // Integrated Schedule Section
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(24.dp),
-                color = Color.White.copy(alpha = 0.15f)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    ScheduleItem(
-                        icon = Icons.Default.CalendarToday,
-                        value = appointment.appointmentDate,
-                        isFloating = false
-                    )
-                    Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(32.dp)
-                            .background(Color.White.copy(alpha = 0.3f))
-                    )
-                    ScheduleItem(
-                        icon = Icons.Default.Schedule,
-                        value = appointment.appointmentTime,
-                        isFloating = false
-                    )
-                }
-            }
         }
-    }
-}
-
-@Composable
-private fun ScheduleItem(icon: ImageVector, value: String, isFloating: Boolean = false) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = icon, 
-            contentDescription = null, 
-            modifier = Modifier.size(22.dp),
-            tint = if (isFloating) MaterialTheme.colorScheme.primary else Color.White
-        )
-        Spacer(Modifier.width(10.dp))
-        Text(
-            text = value, 
-            style = MaterialTheme.typography.bodyLarge, 
-            fontWeight = FontWeight.Bold,
-            color = if (isFloating) MaterialTheme.colorScheme.onPrimaryContainer else Color.White,
-            maxLines = 1
-        )
     }
 }
 
@@ -548,7 +575,7 @@ fun AppointmentDetailScreenPreview() {
     val mockAppointment = AppointmentDto(
         id = "10245",
         doctor = UserDto("1", "Dr. Aarti Mishra", "aarti@example.com", "DOCTOR", 23),
-        patient = PatientDto("P101", "Rahul Kumar", "rahul@example.com", "PATIENT", 28, "Male", "O+"),
+        patient = PatientDto("P101", "Rahul Kumar", "rahul@example.com", "PATIENT", 28, "Male", "O+", weight = 72.0, height = 175.0),
         appointmentDate = "27 Oct, 2023",
         appointmentTime = "10:30 AM",
         status = "BOOKED"

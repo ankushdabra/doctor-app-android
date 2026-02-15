@@ -377,7 +377,9 @@ fun CreatePrescriptionScreenPreview() {
             id = "p1",
             name = "John Doe",
             email = "john@example.com",
-            role = "PATIENT"
+            role = "PATIENT",
+            weight = 70.0,
+            height = 175.0
         ),
         appointmentDate = "2024-08-15",
         appointmentTime = "10:00 AM",

@@ -547,7 +547,9 @@ fun AppointmentListScreenPreview() {
                 "PATIENT",
                 21,
                 "Female",
-                "O+"
+                "O+",
+                weight = 55.0,
+                height = 162.0
             ),
             appointmentDate = today,
             appointmentTime = "09:00 AM",
@@ -556,7 +558,7 @@ fun AppointmentListScreenPreview() {
         AppointmentDto(
             id = "2",
             doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR"),
-            patient = PatientDto("2", "John Smith", "john@gmail.com", "PATIENT", 45, "Male", "A+"),
+            patient = PatientDto("2", "John Smith", "john@gmail.com", "PATIENT", 45, "Male", "A+", weight = 80.0, height = 180.0),
             appointmentDate = today,
             appointmentTime = "10:30 AM",
             status = "PENDING"
@@ -564,7 +566,7 @@ fun AppointmentListScreenPreview() {
         AppointmentDto(
             id = "3",
             doctor = UserDto("1", "Dr. Rahul Mehta", "rahul@example.com", "DOCTOR"),
-            patient = PatientDto("3", "Jane Doe", "jane@gmail.com", "PATIENT", 30, "Female", "B+"),
+            patient = PatientDto("3", "Jane Doe", "jane@gmail.com", "PATIENT", 30, "Female", "B+", weight = 60.0, height = 165.0),
             appointmentDate = tomorrow,
             appointmentTime = "11:00 AM",
             status = "BOOKED"
