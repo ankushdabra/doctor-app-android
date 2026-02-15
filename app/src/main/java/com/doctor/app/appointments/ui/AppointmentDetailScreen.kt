@@ -82,7 +82,7 @@ fun AppointmentDetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                    .padding(horizontal = 12.dp, vertical = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Patient Metrics Card
@@ -203,7 +203,7 @@ fun AppointmentDetailScreen(
                     }
                 }
                 
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(24.dp))
                 
                 Button(
                     onClick = { /* Handle Start Consultation */ },
@@ -321,7 +321,7 @@ private fun DetailHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 45.dp, bottomEnd = 45.dp))
+            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),

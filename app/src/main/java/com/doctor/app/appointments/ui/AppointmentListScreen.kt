@@ -254,7 +254,7 @@ private fun DateHeader(date: String) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
         Text(
             text = displayDate,
@@ -302,7 +302,7 @@ private fun AppointmentHeader(count: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 45.dp, bottomEnd = 45.dp))
+            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
@@ -424,7 +424,7 @@ private fun AppointmentItemCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 12.dp)
             .clickable { onClick(appointment) },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
