@@ -6,9 +6,14 @@ import com.doctor.app.core.storage.TokenManager
 
 data class AuthResult(val user: UserDto, val token: String)
 
-class AuthenticationRepository(tokenManager: TokenManager) {
-    private val api: ApiUrlMapper = NetworkModule.provideRetrofit(tokenManager)
-        .create(ApiUrlMapper::class.java)
+class AuthenticationRepository(private val tokenManager: TokenManager) {
+    // Making the API initialization lazy prevents OkHttpClient from being built 
+    // during the initial render in Android Studio Layout Preview, which avoids 
+    // ClassNotFoundException for Conscrypt classes not available in the IDE environment.
+    private val api: ApiUrlMapper by lazy {
+        NetworkModule.provideRetrofit(tokenManager)
+            .create(ApiUrlMapper::class.java)
+    }
 
     suspend fun login(email: String, password: String): Result<LoginResponseDto> {
         return try {

@@ -4,9 +4,14 @@ import com.doctor.app.core.network.ApiUrlMapper
 import com.doctor.app.core.network.NetworkModule
 import com.doctor.app.core.storage.TokenManager
 
-class AppointmentRepository(tokenManager: TokenManager) {
-    private val api: ApiUrlMapper = NetworkModule.provideRetrofit(tokenManager)
-        .create(ApiUrlMapper::class.java)
+class AppointmentRepository(private val tokenManager: TokenManager) {
+    // Making the API initialization lazy prevents OkHttpClient from being built 
+    // during the initial render in Android Studio Layout Preview, which avoids 
+    // ClassNotFoundException for Conscrypt classes not available in the IDE environment.
+    private val api: ApiUrlMapper by lazy {
+        NetworkModule.provideRetrofit(tokenManager)
+            .create(ApiUrlMapper::class.java)
+    }
 
     suspend fun getAppointments(): Result<List<AppointmentDto>> {
         return try {
