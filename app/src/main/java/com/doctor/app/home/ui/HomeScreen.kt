@@ -2,6 +2,7 @@ package com.doctor.app.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,7 +68,6 @@ import com.doctor.app.core.ui.theme.PatientsTodayAccentDark
 import com.doctor.app.core.ui.theme.PatientsTodayAccentLight
 import com.doctor.app.core.ui.theme.PatientsTodayCardDark
 import com.doctor.app.core.ui.theme.PatientsTodayCardLight
-import com.doctor.app.core.ui.theme.PrimaryLight
 import com.doctor.app.core.ui.theme.ScheduleAmberAccentDark
 import com.doctor.app.core.ui.theme.ScheduleAmberAccentLight
 import com.doctor.app.core.ui.theme.ScheduleAmberDark
@@ -85,7 +84,6 @@ import com.doctor.app.core.ui.theme.ScheduleTealAccentDark
 import com.doctor.app.core.ui.theme.ScheduleTealAccentLight
 import com.doctor.app.core.ui.theme.ScheduleTealDark
 import com.doctor.app.core.ui.theme.ScheduleTealLight
-import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.home.viewmodel.HomeViewModel
 import com.doctor.app.home.viewmodel.HomeViewModelFactory
 import com.doctor.app.login.api.UserDto
@@ -240,6 +238,7 @@ private fun NextAppointmentHighlight(
     onStartClick: (AppointmentDto) -> Unit
 ) {
     val contentColor = Color.White
+    val isDark = isSystemInDarkTheme()
     
     Card(
         modifier = Modifier
@@ -253,17 +252,24 @@ private fun NextAppointmentHighlight(
                 .fillMaxWidth()
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.9f)),
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.secondary
+                        ),
                         start = Offset(0f, 0f),
                         end = Offset(1000f, 1000f)
                     )
                 )
         ) {
+            // Decorative background element
             Box(
                 modifier = Modifier
                     .offset(x = 260.dp, y = (-30).dp)
                     .size(180.dp)
-                    .background(color = Color.White.copy(alpha = 0.08f), shape = CircleShape)
+                    .background(
+                        color = Color.White.copy(alpha = if (isDark) 0.04f else 0.08f),
+                        shape = CircleShape
+                    )
             )
             
             Column(modifier = Modifier.padding(24.dp)) {
@@ -343,7 +349,7 @@ private fun NextAppointmentHighlight(
                         onClick = { onStartClick(appointment) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = contentColor, 
-                            contentColor = PrimaryLight
+                            contentColor = MaterialTheme.colorScheme.primary
                         ),
                         shape = RoundedCornerShape(14.dp),
                         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
@@ -358,7 +364,7 @@ private fun NextAppointmentHighlight(
 
 @Composable
 private fun StatsGrid(uiState: UiState<TodaysAppointmentsResponse>) {
-    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val isDark = isSystemInDarkTheme()
     
     val patientCount = remember(uiState) {
         if (uiState is UiState.Success) uiState.data.appointments.size.toString() else "--"
@@ -463,7 +469,7 @@ private fun AppointmentsRow(
         return
     }
 
-    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val isDark = isSystemInDarkTheme()
     
     val colorSchemes = remember(isDark) {
         listOf(

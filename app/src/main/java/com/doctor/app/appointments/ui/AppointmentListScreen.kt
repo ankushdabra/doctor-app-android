@@ -44,7 +44,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,8 +60,6 @@ import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.components.LoadingState
 import com.doctor.app.core.ui.theme.HealthcareTheme
-import com.doctor.app.core.ui.theme.PrimaryLight
-import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.UserDto
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -310,7 +307,10 @@ private fun AppointmentHeader(count: Int) {
             .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.secondary
+                    ),
                     start = Offset(0f, 0f),
                     end = Offset(1000f, 1000f)
                 )

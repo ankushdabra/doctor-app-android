@@ -1,6 +1,5 @@
 package com.doctor.app.appointments.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -68,8 +67,6 @@ import com.doctor.app.appointments.api.PatientDto
 import com.doctor.app.appointments.viewmodel.PrescriptionViewModel
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.theme.HealthcareTheme
-import com.doctor.app.core.ui.theme.PrimaryLight
-import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.UserDto
 
 @Composable
@@ -154,6 +151,7 @@ fun CreatePrescriptionContent(
                         text = "Prescription Details",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
@@ -216,12 +214,14 @@ fun CreatePrescriptionContent(
                         enabled = uiState !is UiState.Loading && medications.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
-                        )
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
                         if (uiState is UiState.Loading) {
                             CircularProgressIndicator(
                                 color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp
                             )
                         } else {
                             Text(
@@ -260,13 +260,16 @@ private fun PrescriptionHeader(appointment: AppointmentDto) {
             .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.secondary
+                    ),
                     start = Offset(0f, 0f),
                     end = Offset(1000f, 1000f)
                 )
             )
     ) {
-        // Decorative circles matching AppointmentDetailScreen
+        // Decorative circles
         Box(
             modifier = Modifier
                 .offset(x = 280.dp, y = (-40).dp)
@@ -352,7 +355,13 @@ private fun PrescriptionInputCard(
                 value = value,
                 onValueChange = onValueChange,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(placeholder, style = MaterialTheme.typography.bodyMedium) },
+                placeholder = {
+                    Text(
+                        text = placeholder,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                },
                 shape = RoundedCornerShape(12.dp),
                 minLines = 3,
                 keyboardOptions = KeyboardOptions(imeAction = imeAction),
@@ -387,8 +396,6 @@ fun CreatePrescriptionScreenPreview() {
     )
 
     HealthcareTheme {
-        // Use CreatePrescriptionContent directly in Preview to avoid NoClassDefFoundError
-        // related to OkHttp/Conscrypt initialization when creating a real ViewModel/Repository.
         CreatePrescriptionContent(
             appointment = appointment,
             uiState = UiState.Success(false),

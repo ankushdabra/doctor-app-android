@@ -38,8 +38,6 @@ import com.doctor.app.R
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.theme.HealthcareTheme
-import com.doctor.app.core.ui.theme.PrimaryLight
-import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.viewmodel.LoginViewModel
 import com.doctor.app.login.viewmodel.LoginViewModelFactory
@@ -118,7 +116,10 @@ fun LoginContent(
                     .clip(RoundedCornerShape(bottomStart = 64.dp, bottomEnd = 64.dp))
                     .background(
                         brush = Brush.verticalGradient(
-                            colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f))
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
+                            )
                         )
                     )
             )
@@ -193,22 +194,22 @@ fun LoginContent(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        
+
                         Spacer(Modifier.height(24.dp))
 
                         OutlinedTextField(
                             value = email,
-                            onValueChange = { 
+                            onValueChange = {
                                 email = it
                                 emailError = null
                             },
                             label = { Text("Email Address") },
-                            leadingIcon = { 
+                            leadingIcon = {
                                 Icon(
-                                    Icons.Default.Email, 
+                                    Icons.Default.Email,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary
-                                ) 
+                                )
                             },
                             isError = emailError != null,
                             supportingText = emailError?.let { { Text(it) } },
@@ -225,17 +226,17 @@ fun LoginContent(
 
                         OutlinedTextField(
                             value = password,
-                            onValueChange = { 
+                            onValueChange = {
                                 password = it
                                 passwordError = null
                             },
                             label = { Text("Password") },
-                            leadingIcon = { 
+                            leadingIcon = {
                                 Icon(
-                                    Icons.Default.Lock, 
+                                    Icons.Default.Lock,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary
-                                ) 
+                                )
                             },
                             trailingIcon = {
                                 IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
@@ -258,7 +259,7 @@ fun LoginContent(
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         Text(
                             text = "Forgot Password?",
                             modifier = Modifier.align(Alignment.End),
@@ -270,7 +271,7 @@ fun LoginContent(
                         Spacer(Modifier.height(24.dp))
 
                         Button(
-                            onClick = { 
+                            onClick = {
                                 if (validate()) {
                                     onLoginClick(email, password)
                                 }

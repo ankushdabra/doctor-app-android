@@ -71,7 +71,10 @@ import com.doctor.app.appointments.viewmodel.PrescriptionViewModel
 import com.doctor.app.appointments.viewmodel.PrescriptionViewModelFactory
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.HealthcareTheme
-import com.doctor.app.core.ui.theme.PrimaryLight
+import com.doctor.app.core.ui.theme.MetricBlue
+import com.doctor.app.core.ui.theme.MetricGreen
+import com.doctor.app.core.ui.theme.MetricOrange
+import com.doctor.app.core.ui.theme.MetricRed
 import com.doctor.app.core.ui.theme.SchedulePurpleAccentDark
 import com.doctor.app.core.ui.theme.SchedulePurpleAccentLight
 import com.doctor.app.core.ui.theme.SchedulePurpleDark
@@ -80,7 +83,6 @@ import com.doctor.app.core.ui.theme.ScheduleTealAccentDark
 import com.doctor.app.core.ui.theme.ScheduleTealAccentLight
 import com.doctor.app.core.ui.theme.ScheduleTealDark
 import com.doctor.app.core.ui.theme.ScheduleTealLight
-import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.UserDto
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +92,7 @@ fun AppointmentDetailScreen(
     onBackClick: () -> Unit
 ) {
     var showPrescriptionScreen by remember { mutableStateOf(false) }
-    
+
     val context = LocalContext.current
     val tokenManager = remember { TokenManager(context) }
     val repository = remember { AppointmentRepository(tokenManager) }
@@ -211,11 +213,11 @@ fun AppointmentDetailContent(
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                                 )
                             }
-                            
+
                             Spacer(Modifier.height(24.dp))
-                            
+
                             Row(
-                                modifier = Modifier.fillMaxWidth(), 
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 MetricBox(
@@ -224,7 +226,7 @@ fun AppointmentDetailContent(
                                     value = "${appointment.patient.age ?: "N/A"}",
                                     unit = "years",
                                     icon = Icons.Outlined.Badge,
-                                    color = Color(0xFF64B5F6)
+                                    color = MetricBlue
                                 )
                                 MetricBox(
                                     modifier = Modifier.weight(1f),
@@ -232,36 +234,36 @@ fun AppointmentDetailContent(
                                     value = appointment.patient.bloodGroup ?: "N/A",
                                     unit = "group",
                                     icon = Icons.Outlined.WaterDrop,
-                                    color = Color(0xFFE57373)
+                                    color = MetricRed
                                 )
                             }
-                            
+
                             Spacer(Modifier.height(12.dp))
-                            
+
                             Row(
-                                modifier = Modifier.fillMaxWidth(), 
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 MetricBox(
                                     modifier = Modifier.weight(1f),
                                     label = "Weight",
-                                    value = "${appointment.patient.weight ?: "N/A"}", 
+                                    value = "${appointment.patient.weight ?: "N/A"}",
                                     unit = "kg",
                                     icon = Icons.Outlined.Scale,
-                                    color = Color(0xFF81C784)
+                                    color = MetricGreen
                                 )
                                 MetricBox(
                                     modifier = Modifier.weight(1f),
                                     label = "Height",
-                                    value = "${appointment.patient.height ?: "N/A"}", 
+                                    value = "${appointment.patient.height ?: "N/A"}",
                                     unit = "cm",
                                     icon = Icons.Outlined.Straighten,
-                                    color = Color(0xFFFFB74D)
+                                    color = MetricOrange
                                 )
                             }
-                            
+
                             Spacer(Modifier.height(24.dp))
-                            
+
                             Surface(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(20.dp),
@@ -274,7 +276,10 @@ fun AppointmentDetailContent(
                                     Box(
                                         modifier = Modifier
                                             .size(40.dp)
-                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                                            .background(
+                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                                CircleShape
+                                            ),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
@@ -301,9 +306,9 @@ fun AppointmentDetailContent(
                             }
                         }
                     }
-                    
+
                     Spacer(Modifier.height(24.dp))
-                    
+
                     Button(
                         onClick = onStartConsultation,
                         modifier = Modifier
@@ -317,16 +322,16 @@ fun AppointmentDetailContent(
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
                         Text(
-                            text = "Start Consultation", 
-                            fontSize = 18.sp, 
+                            text = "Start Consultation",
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
                     }
-                    
+
                     Spacer(Modifier.height(16.dp))
-                    
+
                     Row(
-                        modifier = Modifier.fillMaxWidth(), 
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Button(
@@ -342,7 +347,7 @@ fun AppointmentDetailContent(
                         ) {
                             Text("Reschedule", fontWeight = FontWeight.Bold)
                         }
-                        
+
                         Button(
                             onClick = { /* Handle Cancel */ },
                             modifier = Modifier
@@ -350,14 +355,14 @@ fun AppointmentDetailContent(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isDark) Color(0xFF422222) else Color(0xFFFFEBEE),
-                                contentColor = if (isDark) Color(0xFFFFB4B4) else Color(0xFFD32F2F)
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
                             )
                         ) {
                             Text("Cancel", fontWeight = FontWeight.Bold)
                         }
                     }
-                    
+
                     Spacer(Modifier.height(32.dp))
                 }
             }
@@ -391,7 +396,7 @@ private fun ScheduleTile(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
-        color = containerColor.copy(alpha = 0.8f),
+        color = containerColor.copy(alpha = 0.1f),
         border = androidx.compose.foundation.BorderStroke(1.dp, contentColor.copy(alpha = 0.1f))
     ) {
         Column(
@@ -487,7 +492,10 @@ private fun DetailHeader(
             .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.secondary
+                    ),
                     start = Offset(0f, 0f),
                     end = Offset(1000f, 1000f)
                 )
@@ -575,7 +583,17 @@ fun AppointmentDetailScreenPreview() {
     val mockAppointment = AppointmentDto(
         id = "10245",
         doctor = UserDto("1", "Dr. Aarti Mishra", "aarti@example.com", "DOCTOR", 23),
-        patient = PatientDto("P101", "Rahul Kumar", "rahul@example.com", "PATIENT", 28, "Male", "O+", weight = 72.0, height = 175.0),
+        patient = PatientDto(
+            "P101",
+            "Rahul Kumar",
+            "rahul@example.com",
+            "PATIENT",
+            28,
+            "Male",
+            "O+",
+            weight = 72.0,
+            height = 175.0
+        ),
         appointmentDate = "27 Oct, 2023",
         appointmentTime = "10:30 AM",
         status = "BOOKED"

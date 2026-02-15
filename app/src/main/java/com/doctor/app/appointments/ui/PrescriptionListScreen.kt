@@ -40,8 +40,6 @@ import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.components.LoadingState
 import com.doctor.app.core.ui.theme.HealthcareTheme
-import com.doctor.app.core.ui.theme.PrimaryLight
-import com.doctor.app.core.ui.theme.SecondaryLight
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -286,7 +284,10 @@ private fun PrescriptionHeader(count: Int) {
             .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.secondary
+                    ),
                     start = Offset(0f, 0f),
                     end = Offset(1000f, 1000f)
                 )
@@ -417,7 +418,7 @@ private fun PrescriptionItemCard(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    
+
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.EventNote,
@@ -433,7 +434,7 @@ private fun PrescriptionItemCard(
                         )
                     }
                 }
-                
+
                 IconButton(onClick = { /* View details */ }) {
                     Icon(
                         imageVector = Icons.Outlined.Description,
@@ -485,7 +486,7 @@ private fun PrescriptionItemCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
                         )
                         Spacer(Modifier.height(12.dp))
-                        
+
                         Text(
                             text = "INSTRUCTIONS",
                             style = MaterialTheme.typography.labelSmall,
