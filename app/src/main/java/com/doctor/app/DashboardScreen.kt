@@ -45,12 +45,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doctor.app.appointments.api.AppointmentDto
+import com.doctor.app.appointments.api.AppointmentRepository
 import com.doctor.app.appointments.ui.AppointmentDetailScreen
 import com.doctor.app.appointments.ui.AppointmentListScreen
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.home.ui.HomeScreen
+import com.doctor.app.home.viewmodel.HomeViewModel
+import com.doctor.app.home.viewmodel.HomeViewModelFactory
 import com.doctor.app.login.ui.ProfileScreen
 
 sealed class DashboardTab(
@@ -81,6 +85,12 @@ fun DashboardScreen(
     var selectedTab by remember { mutableStateOf<DashboardTab>(DashboardTab.Home) }
     var selectedAppointment by remember { mutableStateOf<AppointmentDto?>(null) }
     
+    // ViewModel shared for home data reloading
+    val repository = remember { AppointmentRepository(tokenManager) }
+    val homeViewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(repository)
+    )
+
     // Fetch cached user details
     val userDetails by tokenManager.userDetails.collectAsState(initial = null)
 
@@ -157,7 +167,11 @@ fun DashboardScreen(
             if (selectedAppointment != null) {
                 AppointmentDetailScreen(
                     appointment = selectedAppointment!!,
-                    onBackClick = { selectedAppointment = null }
+                    onBackClick = { 
+                        selectedAppointment = null
+                        // Optional: Refresh home data when coming back from details
+                        homeViewModel.loadTodaysAppointments()
+                    }
                 )
             } else {
                 AnimatedContent(

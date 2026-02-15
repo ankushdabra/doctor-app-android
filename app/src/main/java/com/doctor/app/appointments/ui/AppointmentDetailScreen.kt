@@ -1,5 +1,10 @@
 package com.doctor.app.appointments.ui
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +47,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,12 +58,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doctor.app.appointments.api.AppointmentDto
+import com.doctor.app.appointments.api.AppointmentRepository
 import com.doctor.app.appointments.api.PatientDto
+import com.doctor.app.appointments.viewmodel.PrescriptionViewModel
+import com.doctor.app.appointments.viewmodel.PrescriptionViewModelFactory
+import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.core.ui.theme.PrimaryLight
 import com.doctor.app.core.ui.theme.SecondaryLight
@@ -66,8 +81,54 @@ fun AppointmentDetailScreen(
     appointment: AppointmentDto,
     onBackClick: () -> Unit
 ) {
-    val isDark = isSystemInDarkTheme()
+    var showPrescriptionScreen by remember { mutableStateOf(false) }
     
+    val context = LocalContext.current
+    val tokenManager = remember { TokenManager(context) }
+    val repository = remember { AppointmentRepository(tokenManager) }
+    val prescriptionViewModel: PrescriptionViewModel = viewModel(
+        factory = PrescriptionViewModelFactory(repository)
+    )
+
+    // Handle internal back press when in prescription mode
+    BackHandler(enabled = showPrescriptionScreen) {
+        showPrescriptionScreen = false
+    }
+
+    AnimatedContent(
+        targetState = showPrescriptionScreen,
+        transitionSpec = {
+            fadeIn() togetherWith fadeOut()
+        },
+        label = "PrescriptionTransition"
+    ) { isPrescribing ->
+        if (isPrescribing) {
+            CreatePrescriptionScreen(
+                appointment = appointment,
+                viewModel = prescriptionViewModel,
+                onBackClick = { showPrescriptionScreen = false },
+                onPrescriptionCreated = {
+                    showPrescriptionScreen = false
+                    onBackClick()
+                }
+            )
+        } else {
+            AppointmentDetailContent(
+                appointment = appointment,
+                onBackClick = onBackClick,
+                onStartConsultation = { showPrescriptionScreen = true }
+            )
+        }
+    }
+}
+
+@Composable
+fun AppointmentDetailContent(
+    appointment: AppointmentDto,
+    onBackClick: () -> Unit,
+    onStartConsultation: () -> Unit
+) {
+    val isDark = isSystemInDarkTheme()
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
@@ -210,7 +271,7 @@ fun AppointmentDetailScreen(
                     Spacer(Modifier.height(24.dp))
                     
                     Button(
-                        onClick = { /* Handle Start Consultation */ },
+                        onClick = onStartConsultation,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp),
@@ -493,22 +554,6 @@ fun AppointmentDetailScreenPreview() {
         status = "BOOKED"
     )
     HealthcareTheme(darkTheme = false) {
-        AppointmentDetailScreen(appointment = mockAppointment, onBackClick = {})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AppointmentDetailScreenDarkPreview() {
-    val mockAppointment = AppointmentDto(
-        id = "10245",
-        doctor = UserDto("1", "Dr. Aarti Mishra", "aarti@example.com", "DOCTOR", 23),
-        patient = PatientDto("P101", "Rahul Kumar", "rahul@example.com", "PATIENT", 28, "Male", "O+"),
-        appointmentDate = "27 Oct, 2023",
-        appointmentTime = "10:30 AM",
-        status = "BOOKED"
-    )
-    HealthcareTheme(darkTheme = true) {
         AppointmentDetailScreen(appointment = mockAppointment, onBackClick = {})
     }
 }

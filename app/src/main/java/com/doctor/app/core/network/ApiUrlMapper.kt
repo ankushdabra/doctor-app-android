@@ -1,6 +1,7 @@
 package com.doctor.app.core.network
 
 import com.doctor.app.appointments.api.AppointmentDto
+import com.doctor.app.appointments.api.PrescriptionRequestDto
 import com.doctor.app.login.api.DoctorSignUpRequestDto
 import com.doctor.app.login.api.LoginRequestDto
 import com.doctor.app.login.api.LoginResponseDto
@@ -30,4 +31,7 @@ interface ApiUrlMapper {
 
     @GET("/api/appointments/today")
     suspend fun getTodaysAppointments(): List<AppointmentDto>
+
+    @POST("/api/prescriptions")
+    suspend fun createPrescription(@Body request: PrescriptionRequestDto): Response<Unit>
 }

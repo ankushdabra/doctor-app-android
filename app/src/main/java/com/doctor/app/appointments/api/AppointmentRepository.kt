@@ -25,4 +25,17 @@ class AppointmentRepository(tokenManager: TokenManager) {
             Result.failure(e)
         }
     }
+
+    suspend fun createPrescription(request: PrescriptionRequestDto): Result<Unit> {
+        return try {
+            val response = api.createPrescription(request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception(response.errorBody()?.string() ?: "Failed to create prescription"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
