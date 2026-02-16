@@ -192,7 +192,6 @@ private fun NextAppointmentHighlight(
     appointment: AppointmentDto,
     onStartClick: (AppointmentDto) -> Unit
 ) {
-    // consistently deep, professional medical navy gradient requested
     val darkHeaderBrush = Brush.linearGradient(
         colors = listOf(
             Color(0xFF002E69), // Deep Navy
@@ -216,7 +215,6 @@ private fun NextAppointmentHighlight(
                 .fillMaxWidth()
                 .background(brush = darkHeaderBrush)
         ) {
-            // Decorative circles
             Box(
                 modifier = Modifier
                     .offset(x = 260.dp, y = (-30).dp)
@@ -353,7 +351,7 @@ private fun StatsGrid(uiState: UiState<TodaysAppointmentsResponse>) {
             icon = Icons.Outlined.Group,
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            accentColor = MaterialTheme.colorScheme.primary
+            accentColor = MaterialTheme.colorScheme.background
         )
         StatCardEnhanced(
             modifier = Modifier.weight(1f),
@@ -379,37 +377,53 @@ private fun StatCardEnhanced(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // Decorative background element
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .background(accentColor.copy(alpha = 0.1f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon, 
-                    contentDescription = null, 
-                    modifier = Modifier.size(20.dp), 
-                    tint = accentColor
+                    .align(Alignment.TopEnd)
+                    .offset(x = 15.dp, y = (-15).dp)
+                    .size(90.dp)
+                    .background(
+                        color = accentColor.copy(alpha = 0.05f),
+                        shape = CircleShape
+                    )
+            )
+            
+            Column(modifier = Modifier.padding(20.dp)) {
+                Surface(
+                    modifier = Modifier.size(44.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = accentColor.copy(alpha = 0.1f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = icon, 
+                            contentDescription = null, 
+                            modifier = Modifier.size(22.dp),
+                            tint = accentColor
+                        )
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = value, 
+                    style = MaterialTheme.typography.headlineMedium, 
+                    fontWeight = FontWeight.ExtraBold,
+                    color = contentColor
+                )
+                Text(
+                    text = title, 
+                    style = MaterialTheme.typography.labelSmall, 
+                    color = contentColor.copy(alpha = 0.7f),
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.5.sp
                 )
             }
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = value, 
-                style = MaterialTheme.typography.headlineSmall, 
-                fontWeight = FontWeight.Black,
-                color = contentColor
-            )
-            Text(
-                text = title, 
-                style = MaterialTheme.typography.labelSmall, 
-                color = contentColor.copy(alpha = 0.7f),
-                fontWeight = FontWeight.Medium
-            )
         }
     }
 }
@@ -463,9 +477,9 @@ private fun AppointmentSmallCard(
     Card(
         modifier = Modifier
             .width(160.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(24.dp))
             .clickable { onClick(appointment) },
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {

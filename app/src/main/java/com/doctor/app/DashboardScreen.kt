@@ -231,6 +231,7 @@ private fun DashboardBottomBar(
     selectedTab: DashboardTab,
     onTabClick: (DashboardTab) -> Unit
 ) {
+    val isDark = isSystemInDarkTheme()
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = NavigationBarDefaults.Elevation
@@ -257,11 +258,11 @@ private fun DashboardBottomBar(
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    selectedIconColor = if (isDark) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary,
+                    selectedTextColor = if (isDark) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary,
+                    indicatorColor = if (isDark) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             )
         }
