@@ -462,8 +462,7 @@ private fun DetailHeader(
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
-                                modifier = Modifier.size(44.dp),
-                                tint = Color(0xFF002E69)
+                                modifier = Modifier.size(44.dp)
                             )
                         }
                     }

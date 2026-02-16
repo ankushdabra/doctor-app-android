@@ -382,17 +382,6 @@ private fun StatCardEnhanced(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            // Decorative background element
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = 15.dp, y = (-15).dp)
-                    .size(90.dp)
-                    .background(
-                        color = accentColor.copy(alpha = 0.05f),
-                        shape = CircleShape
-                    )
-            )
             
             Column(modifier = Modifier.padding(20.dp)) {
                 Surface(
@@ -404,8 +393,7 @@ private fun StatCardEnhanced(
                         Icon(
                             imageVector = icon, 
                             contentDescription = null, 
-                            modifier = Modifier.size(22.dp),
-                            tint = accentColor
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 }
@@ -454,13 +442,19 @@ private fun AppointmentsRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         itemsIndexed(appointments, key = { _, item -> item.id }) { index, appointment ->
-            val containerColor = if (index % 2 == 0) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceVariant
-            val contentColor = if (index % 2 == 0) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+            val isDark = isSystemInDarkTheme()
+            val accentColor = when (index % 3) {
+                0 -> MaterialTheme.colorScheme.primary
+                1 -> MaterialTheme.colorScheme.secondary
+                else -> MaterialTheme.colorScheme.tertiary
+            }
+            
+            val containerColor = if (isDark) accentColor.copy(alpha = 0.15f) else accentColor.copy(alpha = 0.06f)
             
             AppointmentSmallCard(
                 appointment = appointment, 
                 containerColor = containerColor,
-                contentColor = contentColor,
+                accentColor = accentColor,
                 onClick = onAppointmentClick
             )
         }
@@ -471,47 +465,68 @@ private fun AppointmentsRow(
 private fun AppointmentSmallCard(
     appointment: AppointmentDto,
     containerColor: Color,
-    contentColor: Color,
+    accentColor: Color,
     onClick: (AppointmentDto) -> Unit
 ) {
-    Card(
+    Surface(
         modifier = Modifier
             .width(160.dp)
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(28.dp))
             .clickable { onClick(appointment) },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(28.dp),
+        color = containerColor,
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp, 
+            color = accentColor.copy(alpha = 0.2f)
+        )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Surface(
-                modifier = Modifier.size(40.dp), 
-                shape = CircleShape, 
-                color = contentColor.copy(alpha = 0.1f)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+
+            Column(modifier = Modifier.padding(16.dp)) {
+                Surface(
+                    modifier = Modifier.size(40.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = accentColor.copy(alpha = 0.1f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Person, 
+                            contentDescription = null, 
+                            modifier = Modifier.size(20.dp),
+                            tint = accentColor
+                        )
+                    }
+                }
+                
+                Spacer(Modifier.height(16.dp))
+                
+                Text(
+                    text = appointment.patient.name, 
+                    fontWeight = FontWeight.ExtraBold, 
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    letterSpacing = (-0.5).sp
+                )
+                
+                Spacer(Modifier.height(4.dp))
+                
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Person, 
-                        contentDescription = null, 
-                        tint = contentColor,
-                        modifier = Modifier.size(20.dp)
+                        imageVector = Icons.Outlined.Timer,
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = appointment.appointmentTime, 
+                        style = MaterialTheme.typography.labelSmall, 
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
-            Spacer(Modifier.height(12.dp))
-            Text(
-                text = appointment.patient.name, 
-                fontWeight = FontWeight.Bold, 
-                maxLines = 1,
-                style = MaterialTheme.typography.bodyMedium,
-                color = contentColor
-            )
-            Text(
-                text = appointment.appointmentTime, 
-                style = MaterialTheme.typography.labelSmall, 
-                color = contentColor.copy(alpha = 0.7f),
-                fontWeight = FontWeight.Black
-            )
         }
     }
 }
