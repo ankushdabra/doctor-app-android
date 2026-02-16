@@ -1,20 +1,7 @@
 package com.doctor.app.appointments.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,27 +14,8 @@ import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -161,7 +128,7 @@ fun CreatePrescriptionContent(
                         onValueChange = { medications = it },
                         placeholder = "Enter medications (e.g., Paracetamol 500mg)",
                         icon = Icons.Default.Medication,
-                        imeAction = ImeAction.Next,
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Next,
                         keyboardActions = KeyboardActions(
                             onNext = { focusManager.moveFocus(FocusDirection.Down) }
                         )
@@ -175,7 +142,7 @@ fun CreatePrescriptionContent(
                         onValueChange = { instructions = it },
                         placeholder = "Enter instructions (e.g., Twice a day after meals)",
                         icon = Icons.Default.Description,
-                        imeAction = ImeAction.Next,
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Next,
                         keyboardActions = KeyboardActions(
                             onNext = { focusManager.moveFocus(FocusDirection.Down) }
                         )
@@ -189,7 +156,7 @@ fun CreatePrescriptionContent(
                         onValueChange = { notes = it },
                         placeholder = "Any additional notes or symptoms",
                         icon = Icons.AutoMirrored.Filled.Notes,
-                        imeAction = ImeAction.Done,
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Done,
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 focusManager.clearFocus()
@@ -213,13 +180,14 @@ fun CreatePrescriptionContent(
                         shape = RoundedCornerShape(20.dp),
                         enabled = uiState !is UiState.Loading && medications.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                            containerColor = Color(0xFF002E69),
+                            contentColor = Color.White
                         ),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
                         if (uiState is UiState.Loading) {
                             CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                color = Color.White,
                                 modifier = Modifier.size(24.dp),
                                 strokeWidth = 2.dp
                             )
@@ -253,21 +221,21 @@ fun CreatePrescriptionContent(
 
 @Composable
 private fun PrescriptionHeader(appointment: AppointmentDto) {
-    val isDark = isSystemInDarkTheme()
+    // consistently deep, professional medical navy gradient requested
+    val darkHeaderBrush = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFF002E69), // Deep Navy
+            Color(0xFF004494)  // Professional Blue
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(1000f, 1000f)
+    )
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.secondary
-                    ),
-                    start = Offset(0f, 0f),
-                    end = Offset(1000f, 1000f)
-                )
-            )
+            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+            .background(brush = darkHeaderBrush)
     ) {
         // Decorative circles
         Box(
@@ -275,7 +243,7 @@ private fun PrescriptionHeader(appointment: AppointmentDto) {
                 .offset(x = 280.dp, y = (-40).dp)
                 .size(200.dp)
                 .background(
-                    color = Color.White.copy(alpha = if (isDark) 0.04f else 0.08f),
+                    color = Color.White.copy(alpha = 0.06f),
                     shape = CircleShape
                 )
         )
@@ -323,7 +291,7 @@ private fun PrescriptionInputCard(
     onValueChange: (String) -> Unit,
     placeholder: String,
     icon: ImageVector,
-    imeAction: ImeAction = ImeAction.Default,
+    imeAction: androidx.compose.ui.text.input.ImeAction = androidx.compose.ui.text.input.ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     Card(
@@ -332,14 +300,15 @@ private fun PrescriptionInputCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = Color(0xFF002E69),
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -347,7 +316,7 @@ private fun PrescriptionInputCard(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color(0xFF002E69)
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))

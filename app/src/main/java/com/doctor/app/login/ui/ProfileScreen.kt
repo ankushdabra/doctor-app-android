@@ -86,8 +86,6 @@ import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.components.LoadingState
 import com.doctor.app.core.ui.theme.HealthcareTheme
-import com.doctor.app.core.ui.theme.PrimaryLight
-import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.api.DoctorDetailsDto
 import com.doctor.app.login.api.ProfileUpdateRequestDto
@@ -117,10 +115,17 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    )
+                    colors = if (isSystemInDarkTheme()) {
+                        listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                        )
+                    } else {
+                        listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                        )
+                    }
                 )
             )
     ) {
@@ -267,18 +272,21 @@ fun ProfileContent(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // --- Hero Header Section ---
+            // Consistent dark navy gradient for header as requested
+            val darkHeaderBrush = Brush.linearGradient(
+                colors = listOf(
+                    Color(0xFF002E69), // Deep Navy
+                    Color(0xFF004494)  // Professional Blue
+                ),
+                start = Offset(0f, 0f),
+                end = Offset(1000f, 1000f)
+            )
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f)),
-                            start = Offset(0f, 0f),
-                            end = Offset(1000f, 1000f)
-                        )
-                    )
+                    .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                    .background(brush = darkHeaderBrush)
             ) {
                 // Top Bar with Settings and Cancel (when editing)
                 TopAppBar(
@@ -394,7 +402,7 @@ fun ProfileContent(
                         .offset(x = 280.dp, y = (-40).dp)
                         .size(200.dp)
                         .background(
-                            color = Color.White.copy(alpha = if (isDark) 0.04f else 0.08f),
+                            color = Color.White.copy(alpha = 0.06f),
                             shape = CircleShape
                         )
                 )
@@ -404,7 +412,7 @@ fun ProfileContent(
                         .offset(x = (-30).dp, y = 110.dp)
                         .size(120.dp)
                         .background(
-                            color = Color.White.copy(alpha = if (isDark) 0.03f else 0.05f),
+                            color = Color.White.copy(alpha = 0.04f),
                             shape = CircleShape
                         )
                 )

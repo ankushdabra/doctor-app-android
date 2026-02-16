@@ -2,42 +2,70 @@ package com.doctor.app.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Healthcare App Colors - Primary Brand Color (Deep, Professional Blues)
-val PrimaryLight = Color(0xFF2B57E5)
+// --- Healthcare App Colors ---
+
+// Primary: Professional Medical Blue
+val PrimaryLight = Color(0xFF005AC1)
 val OnPrimaryLight = Color(0xFFFFFFFF)
-val PrimaryContainerLight = Color(0xFFDDE1FF)
-val OnPrimaryContainerLight = Color(0xFF001258)
+val PrimaryContainerLight = Color(0xFF004494) // Dark blue for headers as requested
+val OnPrimaryContainerLight = Color(0xFFFFFFFF)
 
-val SecondaryLight = Color(0xFF585D71)
+val PrimaryDark = Color(0xFF82B1FF) // Muted medical blue for dark mode
+val OnPrimaryDark = Color(0xFF002E69)
+val PrimaryContainerDark = Color(0xFF004494)
+val OnPrimaryContainerDark = Color(0xFFD0E1FF)
+
+// Secondary: Calming Teal/Blue-Grey
+val SecondaryLight = Color(0xFF535E78)
 val OnSecondaryLight = Color(0xFFFFFFFF)
-val SecondaryContainerLight = Color(0xFFDCE1F9)
-val OnSecondaryContainerLight = Color(0xFF151B2C)
+val SecondaryContainerLight = Color(0xFFD0E1FF)
+val OnSecondaryContainerLight = Color(0xFF0F1B32)
 
-val TertiaryLight = Color(0xFF745470)
+val SecondaryDark = Color(0xFFBBC6E4)
+val OnSecondaryDark = Color(0xFF253048)
+val SecondaryContainerDark = Color(0xFF3B475F)
+val OnSecondaryContainerDark = Color(0xFFD0E1FF)
+
+// Tertiary: Soft Accent (Purple/Rose)
+val TertiaryLight = Color(0xFF755470)
 val OnTertiaryLight = Color(0xFFFFFFFF)
+val TertiaryContainerLight = Color(0xFFFFD7F6)
+val OnTertiaryContainerLight = Color(0xFF2C122A)
 
-// Background & Surface for Light mode
-val BackgroundLight = Color(0xFFF8F9FF)
-val SurfaceLight = Color(0xFFFFFFFF)
+val TertiaryDark = Color(0xFFE3BADA)
+val OnTertiaryDark = Color(0xFF43273F)
+val TertiaryContainerDark = Color(0xFF5B3D57)
+val OnTertiaryContainerDark = Color(0xFFFFD7F6)
 
-// Healthcare App Colors - Dark Mode
-val PrimaryDark = Color(0xFFB9C3FF)
-val OnPrimaryDark = Color(0xFF00258B)
-val PrimaryContainerDark = Color(0xFF0038C0)
-val OnPrimaryContainerDark = Color(0xFFDDE1FF)
+// Error Colors
+val ErrorLight = Color(0xFFBA1A1A)
+val OnErrorLight = Color(0xFFFFFFFF)
+val ErrorContainerLight = Color(0xFFFFDAD6)
+val OnErrorContainerLight = Color(0xFF410002)
 
-val SecondaryDark = Color(0xFFC0C5DD)
-val OnSecondaryDark = Color(0xFF2A2F42)
-val SecondaryContainerDark = Color(0xFF414659)
-val OnSecondaryContainerDark = Color(0xFFDCE1F9)
+val ErrorDark = Color(0xFFFFB4AB)
+val OnErrorDark = Color(0xFF690005)
+val ErrorContainerDark = Color(0xFF93000A)
+val OnErrorContainerDark = Color(0xFFFFDAD6)
 
-val TertiaryDark = Color(0xFFE2BBDC)
-val OnTertiaryDark = Color(0xFF422740)
+// Background & Surface
+val BackgroundLight = Color(0xFFFEFBFF)
+val OnBackgroundLight = Color(0xFF1B1B1F)
+val SurfaceLight = Color(0xFFFEFBFF)
+val OnSurfaceLight = Color(0xFF1B1B1F)
+val SurfaceVariantLight = Color(0xFFE1E2EC)
+val OnSurfaceVariantLight = Color(0xFF44474F)
+val OutlineLight = Color(0xFF74777F)
 
-val BackgroundDark = Color(0xFF0B0D11)
-val SurfaceDark = Color(0xFF2C3039)    // Brighter surface for cards (config update)
-val OnSurfaceDark = Color(0xFFE2E2E6)
-val OnBackgroundDark = Color(0xFFE2E2E6)
+val BackgroundDark = Color(0xFF121316) // Slightly darker background to make surface cards pop
+val SurfaceDark = Color(0xFF232429)    // Lighter surface for cards in dark mode as requested
+val OnSurfaceDark = Color(0xFFE3E2E6)
+val OnBackgroundDark = Color(0xFFE3E2E6)
+val SurfaceVariantDark = Color(0xFF33363D) // Adjusted surface variant for better consistency
+val OnSurfaceVariantDark = Color(0xFFC4C6D0)
+val OutlineDark = Color(0xFF8E9099)
+
+// --- Custom Dashboard & Semantic Colors ---
 
 // Dashboard Stats Colors
 val PatientsTodayCardLight = Color(0xFFE3F2FD)

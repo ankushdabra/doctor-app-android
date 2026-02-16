@@ -7,19 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,17 +23,7 @@ import androidx.compose.material.icons.outlined.MonitorHeart
 import androidx.compose.material.icons.outlined.Scale
 import androidx.compose.material.icons.outlined.Straighten
 import androidx.compose.material.icons.outlined.WaterDrop
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -70,19 +48,9 @@ import com.doctor.app.appointments.api.PatientDto
 import com.doctor.app.appointments.viewmodel.PrescriptionViewModel
 import com.doctor.app.appointments.viewmodel.PrescriptionViewModelFactory
 import com.doctor.app.core.storage.TokenManager
+import com.doctor.app.core.ui.theme.CancelBackgroundDark
+import com.doctor.app.core.ui.theme.CancelBackgroundLight
 import com.doctor.app.core.ui.theme.HealthcareTheme
-import com.doctor.app.core.ui.theme.MetricBlue
-import com.doctor.app.core.ui.theme.MetricGreen
-import com.doctor.app.core.ui.theme.MetricOrange
-import com.doctor.app.core.ui.theme.MetricRed
-import com.doctor.app.core.ui.theme.SchedulePurpleAccentDark
-import com.doctor.app.core.ui.theme.SchedulePurpleAccentLight
-import com.doctor.app.core.ui.theme.SchedulePurpleDark
-import com.doctor.app.core.ui.theme.SchedulePurpleLight
-import com.doctor.app.core.ui.theme.ScheduleTealAccentDark
-import com.doctor.app.core.ui.theme.ScheduleTealAccentLight
-import com.doctor.app.core.ui.theme.ScheduleTealDark
-import com.doctor.app.core.ui.theme.ScheduleTealLight
 import com.doctor.app.login.api.UserDto
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -154,11 +122,11 @@ fun AppointmentDetailContent(
                     appointment = appointment
                 )
 
-                // Vibrant Appointment Schedule Tiles
+                // Vibrant Appointment Schedule Tiles - Using Material 3 Containers
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
+                        .padding(horizontal = 16.dp)
                         .padding(top = 24.dp, bottom = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -167,23 +135,25 @@ fun AppointmentDetailContent(
                         icon = Icons.Default.CalendarToday,
                         label = "Date",
                         value = appointment.appointmentDate,
-                        containerColor = if (isDark) ScheduleTealDark else ScheduleTealLight,
-                        contentColor = if (isDark) ScheduleTealAccentDark else ScheduleTealAccentLight
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        accentColor = MaterialTheme.colorScheme.primary
                     )
                     ScheduleTile(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.Schedule,
                         label = "Time",
                         value = appointment.appointmentTime,
-                        containerColor = if (isDark) SchedulePurpleDark else SchedulePurpleLight,
-                        contentColor = if (isDark) SchedulePurpleAccentDark else SchedulePurpleAccentLight
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        accentColor = MaterialTheme.colorScheme.secondary
                     )
                 }
 
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 12.dp),
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Patient Metrics Card
@@ -193,7 +163,11 @@ fun AppointmentDetailContent(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface,
                         ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                        )
                     ) {
                         Column(modifier = Modifier.padding(24.dp)) {
                             Row(
@@ -226,7 +200,8 @@ fun AppointmentDetailContent(
                                     value = "${appointment.patient.age ?: "N/A"}",
                                     unit = "years",
                                     icon = Icons.Outlined.Badge,
-                                    color = MetricBlue
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 MetricBox(
                                     modifier = Modifier.weight(1f),
@@ -234,7 +209,8 @@ fun AppointmentDetailContent(
                                     value = appointment.patient.bloodGroup ?: "N/A",
                                     unit = "group",
                                     icon = Icons.Outlined.WaterDrop,
-                                    color = MetricRed
+                                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f),
+                                    contentColor = MaterialTheme.colorScheme.error
                                 )
                             }
 
@@ -250,7 +226,8 @@ fun AppointmentDetailContent(
                                     value = "${appointment.patient.weight ?: "N/A"}",
                                     unit = "kg",
                                     icon = Icons.Outlined.Scale,
-                                    color = MetricGreen
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                                 MetricBox(
                                     modifier = Modifier.weight(1f),
@@ -258,7 +235,8 @@ fun AppointmentDetailContent(
                                     value = "${appointment.patient.height ?: "N/A"}",
                                     unit = "cm",
                                     icon = Icons.Outlined.Straighten,
-                                    color = MetricOrange
+                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
+                                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                                 )
                             }
 
@@ -299,7 +277,8 @@ fun AppointmentDetailContent(
                                         Text(
                                             text = appointment.patient.email,
                                             style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
@@ -341,7 +320,7 @@ fun AppointmentDetailContent(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         ) {
@@ -355,8 +334,8 @@ fun AppointmentDetailContent(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer,
-                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                containerColor = if (isDark) CancelBackgroundDark else CancelBackgroundLight,
+                                contentColor = MaterialTheme.colorScheme.error
                             )
                         ) {
                             Text("Cancel", fontWeight = FontWeight.Bold)
@@ -391,13 +370,14 @@ private fun ScheduleTile(
     label: String,
     value: String,
     containerColor: Color,
-    contentColor: Color
+    contentColor: Color,
+    accentColor: Color
 ) {
-    Surface(
+    Card(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
-        color = containerColor.copy(alpha = 0.1f),
-        border = androidx.compose.foundation.BorderStroke(1.dp, contentColor.copy(alpha = 0.1f))
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -406,13 +386,13 @@ private fun ScheduleTile(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(contentColor.copy(alpha = 0.15f), CircleShape),
+                    .background(accentColor.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = contentColor,
+                    tint = accentColor,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -427,7 +407,7 @@ private fun ScheduleTile(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.ExtraBold,
-                color = if (isSystemInDarkTheme()) Color.White else contentColor
+                color = contentColor
             )
         }
     }
@@ -440,20 +420,20 @@ private fun MetricBox(
     value: String,
     unit: String,
     icon: ImageVector,
-    color: Color
+    containerColor: Color,
+    contentColor: Color
 ) {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
-        color = color.copy(alpha = 0.1f),
-        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.1f))
+        color = containerColor,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
-                tint = color
+                tint = contentColor.copy(alpha = 0.8f)
             )
             Spacer(Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.Bottom) {
@@ -461,20 +441,20 @@ private fun MetricBox(
                     text = value,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Black,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = contentColor
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
                     text = unit,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = contentColor.copy(alpha = 0.6f),
                     modifier = Modifier.padding(bottom = 2.dp)
                 )
             }
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                color = contentColor.copy(alpha = 0.6f),
                 fontWeight = FontWeight.Medium
             )
         }
@@ -485,28 +465,29 @@ private fun MetricBox(
 private fun DetailHeader(
     appointment: AppointmentDto
 ) {
-    val isDark = isSystemInDarkTheme()
+    // consistently deep, professional medical navy gradient requested
+    val darkHeaderBrush = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFF002E69), // Deep Navy
+            Color(0xFF004494)  // Professional Blue
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(1000f, 1000f)
+    )
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.secondary
-                    ),
-                    start = Offset(0f, 0f),
-                    end = Offset(1000f, 1000f)
-                )
-            )
+            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+            .background(brush = darkHeaderBrush)
     ) {
+        // Decorative background elements
         Box(
             modifier = Modifier
                 .offset(x = 280.dp, y = (-40).dp)
                 .size(200.dp)
                 .background(
-                    color = Color.White.copy(alpha = if (isDark) 0.04f else 0.08f),
+                    color = Color.White.copy(alpha = 0.06f),
                     shape = CircleShape
                 )
         )
@@ -516,7 +497,7 @@ private fun DetailHeader(
                 .offset(x = (-30).dp, y = 110.dp)
                 .size(120.dp)
                 .background(
-                    color = Color.White.copy(alpha = if (isDark) 0.03f else 0.05f),
+                    color = Color.White.copy(alpha = 0.04f),
                     shape = CircleShape
                 )
         )
@@ -543,8 +524,7 @@ private fun DetailHeader(
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
-                                modifier = Modifier.size(44.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                modifier = Modifier.size(44.dp)
                             )
                         }
                     }
@@ -577,7 +557,7 @@ private fun DetailHeader(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Light Mode")
 @Composable
 fun AppointmentDetailScreenPreview() {
     val mockAppointment = AppointmentDto(
@@ -599,6 +579,32 @@ fun AppointmentDetailScreenPreview() {
         status = "BOOKED"
     )
     HealthcareTheme(darkTheme = false) {
+        AppointmentDetailScreen(appointment = mockAppointment, onBackClick = {})
+    }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES, name = "Dark Mode")
+@Composable
+fun AppointmentDetailScreenDarkPreview() {
+    val mockAppointment = AppointmentDto(
+        id = "10245",
+        doctor = UserDto("1", "Dr. Aarti Mishra", "aarti@example.com", "DOCTOR", 23),
+        patient = PatientDto(
+            "P101",
+            "Rahul Kumar",
+            "rahul@example.com",
+            "PATIENT",
+            28,
+            "Male",
+            "O+",
+            weight = 72.0,
+            height = 175.0
+        ),
+        appointmentDate = "27 Oct, 2023",
+        appointmentTime = "10:30 AM",
+        status = "BOOKED"
+    )
+    HealthcareTheme(darkTheme = true) {
         AppointmentDetailScreen(appointment = mockAppointment, onBackClick = {})
     }
 }

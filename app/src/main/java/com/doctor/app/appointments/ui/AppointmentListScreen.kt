@@ -2,7 +2,6 @@ package com.doctor.app.appointments.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,8 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,6 +54,7 @@ import com.doctor.app.appointments.viewmodel.AppointmentViewModel
 import com.doctor.app.appointments.viewmodel.AppointmentViewModelFactory
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
+import com.doctor.app.core.ui.components.ListScreenHeader
 import com.doctor.app.core.ui.components.LoadingState
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.login.api.UserDto
@@ -109,7 +106,13 @@ private fun AppointmentListContent(
         contentPadding = PaddingValues(bottom = 32.dp)
     ) {
         item {
-            AppointmentHeader(appointments.size)
+            ListScreenHeader(
+                label = "Schedule",
+                countText = "${appointments.size} Patients",
+                title = "Patient Schedule",
+                description = "Manage your patient visits and track scheduled consultations efficiently.",
+                icon = Icons.Default.CalendarToday
+            )
             Spacer(Modifier.height(16.dp))
         }
 
@@ -294,130 +297,6 @@ private fun getDisplayDate(dateString: String): String {
         }
     } catch (e: Exception) {
         dateString
-    }
-}
-
-@Composable
-private fun AppointmentHeader(count: Int) {
-    val isDark = isSystemInDarkTheme()
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.secondary
-                    ),
-                    start = Offset(0f, 0f),
-                    end = Offset(1000f, 1000f)
-                )
-            )
-    ) {
-        // Decorative background elements
-        Box(
-            modifier = Modifier
-                .offset(x = 280.dp, y = (-40).dp)
-                .size(200.dp)
-                .background(
-                    color = Color.White.copy(alpha = if (isDark) 0.04f else 0.08f),
-                    shape = CircleShape
-                )
-        )
-
-        Box(
-            modifier = Modifier
-                .offset(x = (-30).dp, y = 110.dp)
-                .size(120.dp)
-                .background(
-                    color = Color.White.copy(alpha = if (isDark) 0.03f else 0.05f),
-                    shape = CircleShape
-                )
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 48.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(
-                    color = Color.White.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "SCHEDULE",
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    )
-                }
-
-                Surface(
-                    color = Color.White.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "$count Patients",
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Patient Schedule",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Black,
-                        color = Color.White
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        text = "Manage your patient visits and track scheduled consultations efficiently.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f),
-                        lineHeight = 20.sp
-                    )
-                }
-
-                Spacer(Modifier.width(16.dp))
-
-                Surface(
-                    modifier = Modifier.size(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color.White.copy(alpha = 0.15f)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarToday,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                }
-            }
-        }
     }
 }
 

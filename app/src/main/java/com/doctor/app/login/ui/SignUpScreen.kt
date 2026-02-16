@@ -2,6 +2,7 @@ package com.doctor.app.login.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -38,8 +40,6 @@ import com.doctor.app.R
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.theme.HealthcareTheme
-import com.doctor.app.core.ui.theme.PrimaryLight
-import com.doctor.app.core.ui.theme.SecondaryLight
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.api.DoctorSignUpRequestDto
 import com.doctor.app.login.api.TimeSlotDto
@@ -78,6 +78,7 @@ fun SignUpContent(
     onRegistrationSuccess: () -> Unit
 ) {
     var currentStep by remember { mutableStateOf(SignUpStep.PersonalDetails) }
+    val isDark = isSystemInDarkTheme()
 
     // Form data
     var name by remember { mutableStateOf("") }
@@ -148,17 +149,29 @@ fun SignUpContent(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            // Background Elements
+            // Background Elements - Using theme colors and container variants for dark mode
+            val headerBrush = if (isDark) {
+                Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f)
+                    )
+                )
+            } else {
+                Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
+                    )
+                )
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
                     .clip(RoundedCornerShape(bottomStart = 64.dp, bottomEnd = 64.dp))
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(PrimaryLight, SecondaryLight.copy(alpha = 0.8f))
-                        )
-                    )
+                    .background(brush = headerBrush)
             )
 
             Column(
@@ -321,7 +334,7 @@ fun SignUpContent(
                                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                                 ) {
                                     if (state is UiState.Loading) {
-                                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
                                     } else {
                                         Text("Complete", fontWeight = FontWeight.Bold)
                                     }
