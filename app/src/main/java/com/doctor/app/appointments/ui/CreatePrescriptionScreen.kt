@@ -1,6 +1,7 @@
 package com.doctor.app.appointments.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -11,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Person
@@ -35,6 +37,24 @@ import com.doctor.app.appointments.viewmodel.PrescriptionViewModel
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.login.api.UserDto
+
+private val SAMPLE_MEDICINES = listOf(
+    "Paracetamol 500mg",
+    "Amoxicillin 500mg",
+    "Ibuprofen 400mg",
+    "Cetirizine 10mg",
+    "Metformin 500mg",
+    "Atorvastatin 20mg",
+    "Omeprazole 20mg",
+    "Amlodipine 5mg",
+    "Losartan 50mg",
+    "Albuterol Inhaler",
+    "Azithromycin 250mg",
+    "Lisinopril 10mg",
+    "Gabapentin 300mg",
+    "Hydrochlorothiazide 25mg",
+    "Sertraline 50mg"
+)
 
 @Composable
 fun CreatePrescriptionScreen(
@@ -71,12 +91,28 @@ fun CreatePrescriptionContent(
     onPrescriptionCreated: () -> Unit,
     onSubmit: (String, String, String) -> Unit
 ) {
-    var medications by remember { mutableStateOf("") }
+    var selectedMedications by remember { mutableStateOf(emptyList<String>()) }
+    var medicationInput by remember { mutableStateOf("") }
     var instructions by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
+
+    val submitPrescription = {
+        val finalMeds = if (medicationInput.isNotBlank()) {
+            if (selectedMedications.contains(medicationInput)) {
+                selectedMedications.joinToString(", ")
+            } else {
+                (selectedMedications + medicationInput).joinToString(", ")
+            }
+        } else {
+            selectedMedications.joinToString(", ")
+        }
+        if (finalMeds.isNotBlank()) {
+            onSubmit(finalMeds, instructions, notes)
+        }
+    }
 
     LaunchedEffect(uiState) {
         when (uiState) {
@@ -124,13 +160,32 @@ fun CreatePrescriptionContent(
 
                     PrescriptionInputCard(
                         label = "Medications",
-                        value = medications,
-                        onValueChange = { medications = it },
-                        placeholder = "Enter medications (e.g., Paracetamol 500mg)",
+                        value = medicationInput,
+                        onValueChange = { medicationInput = it },
+                        placeholder = if (selectedMedications.isEmpty()) "Enter medications (e.g., Paracetamol 500mg)" else "Add more medications...",
                         icon = Icons.Default.Medication,
+                        suggestions = SAMPLE_MEDICINES,
+                        selectedItems = selectedMedications,
+                        onItemAdd = { medication ->
+                            if (medication.isNotBlank() && !selectedMedications.contains(medication)) {
+                                selectedMedications = selectedMedications + medication
+                            }
+                        },
+                        onItemRemove = { medication ->
+                            selectedMedications = selectedMedications - medication
+                        },
                         imeAction = androidx.compose.ui.text.input.ImeAction.Next,
                         keyboardActions = KeyboardActions(
-                            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                            onNext = {
+                                if (medicationInput.isNotBlank()) {
+                                    if (!selectedMedications.contains(medicationInput)) {
+                                        selectedMedications = selectedMedications + medicationInput
+                                    }
+                                    medicationInput = ""
+                                } else {
+                                    focusManager.moveFocus(FocusDirection.Down)
+                                }
+                            }
                         )
                     )
 
@@ -160,9 +215,7 @@ fun CreatePrescriptionContent(
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 focusManager.clearFocus()
-                                if (medications.isNotBlank()) {
-                                    onSubmit(medications, instructions, notes)
-                                }
+                                submitPrescription()
                             }
                         )
                     )
@@ -172,13 +225,13 @@ fun CreatePrescriptionContent(
                     Button(
                         onClick = {
                             focusManager.clearFocus()
-                            onSubmit(medications, instructions, notes)
+                            submitPrescription()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp),
                         shape = RoundedCornerShape(20.dp),
-                        enabled = uiState !is UiState.Loading && medications.isNotBlank(),
+                        enabled = uiState !is UiState.Loading && (selectedMedications.isNotEmpty() || medicationInput.isNotBlank()),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary
@@ -284,6 +337,7 @@ private fun PrescriptionHeader(appointment: AppointmentDto) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun PrescriptionInputCard(
     label: String,
@@ -291,9 +345,21 @@ private fun PrescriptionInputCard(
     onValueChange: (String) -> Unit,
     placeholder: String,
     icon: ImageVector,
+    suggestions: List<String> = emptyList(),
+    selectedItems: List<String> = emptyList(),
+    onItemAdd: (String) -> Unit = {},
+    onItemRemove: (String) -> Unit = {},
     imeAction: androidx.compose.ui.text.input.ImeAction = androidx.compose.ui.text.input.ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
+    var expanded by remember { mutableStateOf(false) }
+    val filteredSuggestions = remember(value, selectedItems) {
+        if (value.isBlank()) emptyList()
+        else suggestions.filter { 
+            it.contains(value, ignoreCase = true) && !selectedItems.contains(it) && it != value 
+        }
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -320,22 +386,107 @@ private fun PrescriptionInputCard(
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(
-                        text = placeholder,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+
+            if (selectedItems.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    selectedItems.forEach { item ->
+                        InputChip(
+                            selected = true,
+                            onClick = { },
+                            label = { Text(item, style = MaterialTheme.typography.labelSmall) },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Remove",
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .clickable { onItemRemove(item) }
+                                )
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = InputChipDefaults.inputChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            border = null
+                        )
+                    }
+                }
+            }
+            
+            if (suggestions.isNotEmpty()) {
+                ExposedDropdownMenuBox(
+                    expanded = expanded && filteredSuggestions.isNotEmpty(),
+                    onExpandedChange = { expanded = it },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = { 
+                            onValueChange(it)
+                            expanded = true
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true),
+                        placeholder = {
+                            Text(
+                                text = placeholder,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        keyboardOptions = KeyboardOptions(imeAction = imeAction),
+                        keyboardActions = keyboardActions,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                     )
-                },
-                shape = RoundedCornerShape(12.dp),
-                minLines = 3,
-                keyboardOptions = KeyboardOptions(imeAction = imeAction),
-                keyboardActions = keyboardActions
-            )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded && filteredSuggestions.isNotEmpty(),
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        filteredSuggestions.forEach { suggestion ->
+                            DropdownMenuItem(
+                                text = { Text(suggestion) },
+                                onClick = {
+                                    onItemAdd(suggestion)
+                                    onValueChange("")
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                            )
+                        }
+                    }
+                }
+            } else {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            text = placeholder,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    minLines = 3,
+                    keyboardOptions = KeyboardOptions(imeAction = imeAction),
+                    keyboardActions = keyboardActions
+                )
+            }
         }
     }
 }
