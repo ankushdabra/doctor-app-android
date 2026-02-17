@@ -77,55 +77,6 @@ class ProfileViewModel(
         }
     }
 
-    fun updateFullProfile(details: DoctorDetailsDto, availability: Map<String, List<TimeSlotDto>>) {
-        viewModelScope.launch {
-            _updateState.value = UiState.Loading
-            
-            val profileResult = repository.updateDoctorDetails(details)
-            val availabilityResult = repository.updateAvailability(availability)
-            
-            if (profileResult.isSuccess && availabilityResult.isSuccess) {
-                _updateState.value = UiState.Success(Unit)
-                loadProfile() // Refresh profile to get updated details
-            } else {
-                val errorMessage = when {
-                    profileResult.isFailure -> profileResult.exceptionOrNull()?.message
-                    availabilityResult.isFailure -> availabilityResult.exceptionOrNull()?.message
-                    else -> "Failed to update profile"
-                } ?: "Unknown error occurred"
-                _updateState.value = UiState.Error(errorMessage)
-            }
-        }
-    }
-
-    fun updateDoctorDetails(details: DoctorDetailsDto) {
-        viewModelScope.launch {
-            _updateState.value = UiState.Loading
-            repository.updateDoctorDetails(details)
-                .onSuccess {
-                    _updateState.value = UiState.Success(Unit)
-                    loadProfile() // Refresh profile to get updated details
-                }
-                .onFailure { error ->
-                    _updateState.value = UiState.Error(error.message ?: "Failed to update professional details")
-                }
-        }
-    }
-
-    fun updateAvailability(availability: Map<String, List<TimeSlotDto>>) {
-        viewModelScope.launch {
-            _updateState.value = UiState.Loading
-            repository.updateAvailability(availability)
-                .onSuccess {
-                    _updateState.value = UiState.Success(Unit)
-                    loadProfile() // Refresh profile to get updated slots
-                }
-                .onFailure { error ->
-                    _updateState.value = UiState.Error(error.message ?: "Failed to update availability")
-                }
-        }
-    }
-
     fun setThemeMode(mode: String) {
         viewModelScope.launch {
             tokenManager.saveThemeMode(mode)
