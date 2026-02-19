@@ -125,7 +125,7 @@ fun LoginContent(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .fillMaxHeight(0.4f)
                     .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                     .background(brush = headerBrush)
             )
