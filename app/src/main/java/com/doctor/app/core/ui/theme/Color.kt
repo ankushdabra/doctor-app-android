@@ -4,6 +4,10 @@ import androidx.compose.ui.graphics.Color
 
 // --- Healthcare App Colors ---
 
+// Header Colors
+val HeaderNavy = Color(0xFF002E69) // Deep Navy for header gradient
+val HeaderBlue = Color(0xFF004494) // Professional Blue for header gradient
+
 // Primary: Professional Medical Blue
 val PrimaryLight = Color(0xFF005AC1)
 val OnPrimaryLight = Color(0xFFFFFFFF)

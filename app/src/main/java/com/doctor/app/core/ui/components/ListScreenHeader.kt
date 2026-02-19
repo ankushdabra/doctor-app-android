@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.doctor.app.core.ui.theme.HeaderBlue
+import com.doctor.app.core.ui.theme.HeaderNavy
 import com.doctor.app.core.ui.theme.HealthcareTheme
 
 @Composable
@@ -35,8 +37,8 @@ fun ListScreenHeader(
     // A consistently deep, professional medical navy gradient for both light and dark modes
     val darkHeaderBrush = Brush.linearGradient(
         colors = listOf(
-            Color(0xFF002E69), // Deep Navy
-            Color(0xFF004494)  // Professional Blue
+            HeaderNavy, // Deep Navy
+            HeaderBlue  // Professional Blue
         ),
         start = Offset(0f, 0f),
         end = Offset(1000f, 1000f)

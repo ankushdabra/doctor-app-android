@@ -35,6 +35,8 @@ import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.appointments.api.PatientDto
 import com.doctor.app.appointments.viewmodel.PrescriptionViewModel
 import com.doctor.app.core.ui.UiState
+import com.doctor.app.core.ui.theme.HeaderBlue
+import com.doctor.app.core.ui.theme.HeaderNavy
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.login.api.UserDto
 
@@ -277,8 +279,8 @@ private fun PrescriptionHeader(appointment: AppointmentDto) {
     // consistently deep, professional medical navy gradient requested
     val darkHeaderBrush = Brush.linearGradient(
         colors = listOf(
-            Color(0xFF002E69), // Deep Navy
-            Color(0xFF004494)  // Professional Blue
+            HeaderNavy, // Deep Navy
+            HeaderBlue  // Professional Blue
         ),
         start = Offset(0f, 0f),
         end = Offset(1000f, 1000f)
@@ -304,7 +306,7 @@ private fun PrescriptionHeader(appointment: AppointmentDto) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 64.dp, bottom = 32.dp),
+                .padding(top = 48.dp, bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Surface(

@@ -39,6 +39,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doctor.app.R
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
+import com.doctor.app.core.ui.theme.HeaderBlue
+import com.doctor.app.core.ui.theme.HeaderNavy
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.api.DoctorSignUpRequestDto
@@ -150,27 +152,19 @@ fun SignUpContent(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // Background Elements - Using theme colors and container variants for dark mode
-            val headerBrush = if (isDark) {
+            val headerBrush =
                 Brush.verticalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f)
+                        HeaderNavy, // Deep Navy
+                        HeaderBlue.copy(alpha = 0.8f)  // Professional Blue
                     )
                 )
-            } else {
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
-                    )
-                )
-            }
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
-                    .clip(RoundedCornerShape(bottomStart = 64.dp, bottomEnd = 64.dp))
+                    .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                     .background(brush = headerBrush)
             )
 
@@ -274,7 +268,8 @@ fun SignUpContent(
                             Spacer(Modifier.height(32.dp))
                             Button(
                                 onClick = {
-                                    if (validatePersonalDetails()) currentStep = SignUpStep.Availability
+                                    if (validatePersonalDetails()) currentStep =
+                                        SignUpStep.Availability
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -282,9 +277,17 @@ fun SignUpContent(
                                 shape = RoundedCornerShape(16.dp),
                                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                             ) {
-                                Text("Next Step", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text(
+                                    "Next Step",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
                                 Spacer(Modifier.width(8.dp))
-                                Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(20.dp))
+                                Icon(
+                                    Icons.Default.ArrowForward,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
                         } else {
                             AvailabilityForm(
@@ -304,7 +307,11 @@ fun SignUpContent(
                                         .height(56.dp),
                                     shape = RoundedCornerShape(16.dp)
                                 ) {
-                                    Icon(Icons.Default.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Icon(
+                                        Icons.Default.ArrowBack,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                     Spacer(Modifier.width(4.dp))
                                     Text("Back", fontWeight = FontWeight.Bold)
                                 }
@@ -334,7 +341,11 @@ fun SignUpContent(
                                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                                 ) {
                                     if (state is UiState.Loading) {
-                                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(24.dp),
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            strokeWidth = 2.dp
+                                        )
                                     } else {
                                         Text("Complete", fontWeight = FontWeight.Bold)
                                     }
@@ -412,7 +423,13 @@ fun PersonalDetailsForm(
         value = name,
         onValueChange = onNameChange,
         label = { Text("Full Name") },
-        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        leadingIcon = {
+            Icon(
+                Icons.Default.Person,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
         isError = nameError != null,
         supportingText = nameError?.let { { Text(it) } },
         singleLine = true,
@@ -426,7 +443,13 @@ fun PersonalDetailsForm(
         value = email,
         onValueChange = onEmailChange,
         label = { Text("Email Address") },
-        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        leadingIcon = {
+            Icon(
+                Icons.Default.Email,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
         isError = emailError != null,
         supportingText = emailError?.let { { Text(it) } },
         singleLine = true,
@@ -443,10 +466,19 @@ fun PersonalDetailsForm(
         value = password,
         onValueChange = onPasswordChange,
         label = { Text("Password") },
-        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        leadingIcon = {
+            Icon(
+                Icons.Default.Lock,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
         trailingIcon = {
             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                Icon(if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null)
+                Icon(
+                    if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                    contentDescription = null
+                )
             }
         },
         isError = passwordError != null,
@@ -472,7 +504,13 @@ fun PersonalDetailsForm(
             value = specialization,
             onValueChange = onSpecializationChange,
             label = { Text("Specialization") },
-            leadingIcon = { Icon(Icons.Default.MedicalServices, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.MedicalServices,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
             isError = specializationError != null,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = specializationExpanded) },
             modifier = Modifier
@@ -505,7 +543,13 @@ fun PersonalDetailsForm(
             value = qualification,
             onValueChange = onQualificationChange,
             label = { Text("Qualification") },
-            leadingIcon = { Icon(Icons.Default.School, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.School,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
             isError = qualificationError != null,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = qualificationExpanded) },
             modifier = Modifier
@@ -540,7 +584,13 @@ fun PersonalDetailsForm(
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Exp. (Yrs)", maxLines = 1) },
-                leadingIcon = { Icon(Icons.Default.Work, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Work,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
                 isError = experienceError != null,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = experienceExpanded) },
                 modifier = Modifier
@@ -582,7 +632,13 @@ fun PersonalDetailsForm(
         value = clinicAddress,
         onValueChange = onClinicAddressChange,
         label = { Text("Clinic Address") },
-        leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        leadingIcon = {
+            Icon(
+                Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
         isError = clinicAddressError != null,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -652,7 +708,7 @@ fun AvailabilityForm(
                             val amPm = if (hour < 12) "AM" else "PM"
                             val hour12 = if (hour % 12 == 0) 12 else hour % 12
                             val newTime = String.format("%02d:%02d %s", hour12, minute, amPm)
-                            
+
                             val daySlots = availability[dayKey]?.toMutableList() ?: mutableListOf()
                             val currentSlot = daySlots[index]
                             val newSlot = if (isStart) {
@@ -704,7 +760,11 @@ fun AvailabilityForm(
                             currentSlots.add(TimeSlotDto("09:00 AM", "05:00 PM"))
                             onAvailabilityChange(availability + (apiKey to currentSlots))
                         }) {
-                            Icon(Icons.Default.AddCircle, contentDescription = "Add slot", tint = MaterialTheme.colorScheme.primary)
+                            Icon(
+                                Icons.Default.AddCircle,
+                                contentDescription = "Add slot",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                     slots.forEachIndexed { index, slot ->
@@ -716,7 +776,11 @@ fun AvailabilityForm(
                                 text = slot.startTime,
                                 onClick = { showTimePicker = Triple(apiKey, index, true) }
                             )
-                            Text(" to ", modifier = Modifier.padding(horizontal = 8.dp), style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                " to ",
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                style = MaterialTheme.typography.bodySmall
+                            )
                             TimeSlotChip(
                                 text = slot.endTime,
                                 onClick = { showTimePicker = Triple(apiKey, index, false) }

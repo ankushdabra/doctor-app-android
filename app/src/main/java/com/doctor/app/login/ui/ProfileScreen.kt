@@ -85,6 +85,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.core.ui.components.LoadingState
+import com.doctor.app.core.ui.theme.HeaderBlue
+import com.doctor.app.core.ui.theme.HeaderNavy
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.api.DoctorDetailsDto
@@ -275,8 +277,8 @@ fun ProfileContent(
             // Consistent dark navy gradient for header as requested
             val darkHeaderBrush = Brush.linearGradient(
                 colors = listOf(
-                    Color(0xFF002E69), // Deep Navy
-                    Color(0xFF004494)  // Professional Blue
+                    HeaderNavy, // Deep Navy
+                    HeaderBlue  // Professional Blue
                 ),
                 start = Offset(0f, 0f),
                 end = Offset(1000f, 1000f)

@@ -50,6 +50,8 @@ import com.doctor.app.appointments.viewmodel.PrescriptionViewModelFactory
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.theme.CancelBackgroundDark
 import com.doctor.app.core.ui.theme.CancelBackgroundLight
+import com.doctor.app.core.ui.theme.HeaderBlue
+import com.doctor.app.core.ui.theme.HeaderNavy
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.login.api.UserDto
 
@@ -406,8 +408,8 @@ private fun DetailHeader(
     // consistently deep, professional medical navy gradient
     val darkHeaderBrush = Brush.linearGradient(
         colors = listOf(
-            Color(0xFF002E69), // Deep Navy
-            Color(0xFF004494)  // Professional Blue
+            HeaderNavy, // Deep Navy
+            HeaderBlue  // Professional Blue
         ),
         start = Offset(0f, 0f),
         end = Offset(1000f, 1000f)

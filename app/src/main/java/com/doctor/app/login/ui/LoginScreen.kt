@@ -38,6 +38,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doctor.app.R
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
+import com.doctor.app.core.ui.theme.HeaderBlue
+import com.doctor.app.core.ui.theme.HeaderNavy
 import com.doctor.app.core.ui.theme.HealthcareTheme
 import com.doctor.app.login.api.AuthenticationRepository
 import com.doctor.app.login.viewmodel.LoginViewModel
@@ -111,27 +113,20 @@ fun LoginContent(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // Background Elements - Using theme colors and container variants for dark mode
-            val headerBrush = if (isDark) {
+            val headerBrush =
                 Brush.verticalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f)
+                        HeaderNavy, // Deep Navy
+                        HeaderBlue.copy(alpha = 0.8f)  // Professional Blue
                     )
                 )
-            } else {
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
-                    )
-                )
-            }
+
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)
-                    .clip(RoundedCornerShape(bottomStart = 64.dp, bottomEnd = 64.dp))
+                    .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                     .background(brush = headerBrush)
             )
 
