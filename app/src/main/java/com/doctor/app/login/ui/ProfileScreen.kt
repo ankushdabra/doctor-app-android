@@ -278,7 +278,7 @@ fun ProfileContent(
             val darkHeaderBrush = Brush.linearGradient(
                 colors = listOf(
                     HeaderNavy, // Deep Navy
-                    HeaderBlue  // Professional Blue
+                    HeaderBlue.copy(alpha = 0.8f)  // Professional Blue
                 ),
                 start = Offset(0f, 0f),
                 end = Offset(1000f, 1000f)
