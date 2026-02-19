@@ -705,16 +705,23 @@ fun AvailabilityEditor(
             val daySlots = availability[dayKey] ?: emptyList()
             val currentSlot = daySlots.getOrNull(index)
             
-            // Extract initial hour and minute from the existing string (e.g., "09:00")
-            val initialHour = currentSlot?.let { 
-                val time = if (isStart) it.startTime else it.endTime
-                time.split(":").getOrNull(0)?.toIntOrNull()
-            } ?: 9
+            // Extract initial hour and minute from the existing string (e.g., "09:00" or "09:00 AM")
+            val timeString = currentSlot?.let { if (isStart) it.startTime else it.endTime } ?: ""
             
-            val initialMinute = currentSlot?.let {
-                val time = if (isStart) it.startTime else it.endTime
-                time.split(":").getOrNull(1)?.take(2)?.toIntOrNull()
-            } ?: 0
+            val initialHour = if (timeString.isNotEmpty()) {
+                val parts = timeString.split(":")
+                var h = parts.getOrNull(0)?.toIntOrNull() ?: 9
+                if (timeString.contains("PM", ignoreCase = true) && h < 12) h += 12
+                if (timeString.contains("AM", ignoreCase = true) && h == 12) h = 0
+                h
+            } else 9
+            
+            val initialMinute = if (timeString.isNotEmpty()) {
+                val parts = timeString.split(":")
+                if (parts.size > 1) {
+                    parts[1].take(2).toIntOrNull() ?: 0
+                } else 0
+            } else 0
 
             val timePickerState = rememberTimePickerState(
                 initialHour = initialHour,
@@ -747,8 +754,12 @@ fun AvailabilityEditor(
                                 Text("Cancel")
                             }
                             TextButton(onClick = {
-                                val newTime =
-                                    String.format(Locale.getDefault(), "%02d:%02d", timePickerState.hour, timePickerState.minute)
+                                val hour = timePickerState.hour
+                                val minute = timePickerState.minute
+                                val amPm = if (hour < 12) "AM" else "PM"
+                                val hour12 = if (hour % 12 == 0) 12 else hour % 12
+                                val newTime = String.format(Locale.getDefault(), "%02d:%02d %s", hour12, minute, amPm)
+                                
                                 val updatedDaySlots = daySlots.toMutableList()
                                 if (index < updatedDaySlots.size) {
                                     val slotToUpdate = updatedDaySlots[index]
@@ -802,7 +813,7 @@ fun AvailabilityEditor(
                             IconButton(
                                 onClick = {
                                     val currentSlots = slots.toMutableList()
-                                    currentSlots.add(TimeSlotDto("09:00", "17:00"))
+                                    currentSlots.add(TimeSlotDto("09:00 AM", "05:00 PM"))
                                     onAvailabilityChange(availability + (apiKey to currentSlots))
                                 },
                                 modifier = Modifier.size(32.dp)
@@ -880,16 +891,17 @@ fun AvailabilityEditor(
 }
 
 // Helper to format 24h string to AM/PM string for display
-private fun formatTimeForDisplay(time24h: String): String {
+private fun formatTimeForDisplay(time: String): String {
+    if (time.contains("AM") || time.contains("PM")) return time
     return try {
-        val parts = time24h.split(":")
+        val parts = time.split(":")
         val hour = parts[0].toInt()
         val minute = parts[1].take(2).toInt()
         val amPm = if (hour < 12) "AM" else "PM"
         val h12 = if (hour % 12 == 0) 12 else hour % 12
         String.format(Locale.getDefault(), "%02d:%02d %s", h12, minute, amPm)
     } catch (e: Exception) {
-        time24h
+        time
     }
 }
 
@@ -972,8 +984,8 @@ fun ProfileScreenPreview() {
                     about = "Heart specialist with expertise in interventional cardiology.",
                     clinicAddress = "Andheri East, Mumbai",
                     availability = mapOf(
-                        "MON" to listOf(TimeSlotDto("09:00", "12:00"), TimeSlotDto("17:00", "20:00")),
-                        "WED" to listOf(TimeSlotDto("10:00", "15:00"))
+                        "MON" to listOf(TimeSlotDto("09:00 AM", "12:00 PM"), TimeSlotDto("05:00 PM", "08:00 PM")),
+                        "WED" to listOf(TimeSlotDto("10:00 AM", "03:00 PM"))
                     )
                 )
             ),
