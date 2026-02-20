@@ -6,9 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.doctor.app.core.storage.TokenManager
 import com.doctor.app.core.ui.UiState
 import com.doctor.app.login.api.AuthenticationRepository
-import com.doctor.app.login.api.DoctorDetailsDto
 import com.doctor.app.login.api.ProfileUpdateRequestDto
-import com.doctor.app.login.api.TimeSlotDto
 import com.doctor.app.login.api.UserDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -85,6 +83,9 @@ class ProfileViewModel(
 
     fun logout() {
         viewModelScope.launch {
+            // Call the backend to invalidate the session/token if possible
+            repository.logout()
+            // Always clear local storage regardless of backend success
             tokenManager.clearToken()
         }
     }

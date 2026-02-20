@@ -247,10 +247,17 @@ fun ProfileContent(
     var isEditing by remember { mutableStateOf(false) }
     var showSettingsMenu by remember { mutableStateOf(false) }
 
+    // Standard day keys for backend validation
+    val validDayKeys = listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
+
     // Unified states for professional info & availability
+    // Sanitize availability to remove invalid keys like 'additionalProp1'
     var availability by remember(user.doctorDetails?.availability) {
-        mutableStateOf(user.doctorDetails?.availability ?: emptyMap())
+        mutableStateOf<Map<String, List<TimeSlotDto>>>(
+            user.doctorDetails?.availability?.filterKeys { it in validDayKeys } ?: emptyMap()
+        )
     }
+    
     var specialization by remember(details) { mutableStateOf(details?.specialization ?: "") }
     var qualification by remember(details) { mutableStateOf(details?.qualification ?: "") }
     var experience by remember(details) { mutableStateOf(details?.experience?.toString() ?: "0") }
@@ -297,7 +304,7 @@ fun ProfileContent(
                         if (isEditing) {
                             IconButton(onClick = {
                                 // Reset values on cancel
-                                availability = user.doctorDetails?.availability ?: emptyMap()
+                                availability = user.doctorDetails?.availability?.filterKeys { it in validDayKeys } ?: emptyMap()
                                 specialization = details?.specialization ?: ""
                                 qualification = details?.qualification ?: ""
                                 experience = details?.experience?.toString() ?: "0"
@@ -652,7 +659,7 @@ fun ProfileContent(
                         about = about,
                         clinicAddress = clinicAddress,
                         profileImage = details?.profileImage,
-                        availability = availability
+                        availability = availability // Sanitized in state
                     )
                     onUpdateProfile(updateRequest)
                 }

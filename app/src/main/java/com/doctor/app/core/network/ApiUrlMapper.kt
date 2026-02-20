@@ -4,13 +4,11 @@ import com.doctor.app.appointments.api.AppointmentDto
 import com.doctor.app.appointments.api.PrescriptionDto
 import com.doctor.app.appointments.api.PrescriptionRequestDto
 import com.doctor.app.appointments.api.TodaysAppointmentsResponse
-import com.doctor.app.login.api.DoctorDetailsDto
 import com.doctor.app.login.api.DoctorSignUpRequestDto
 import com.doctor.app.login.api.LoginRequestDto
 import com.doctor.app.login.api.LoginResponseDto
 import com.doctor.app.login.api.ProfileUpdateRequestDto
 import com.doctor.app.login.api.SignUpResponseDto
-import com.doctor.app.login.api.TimeSlotDto
 import com.doctor.app.login.api.UserDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -34,12 +32,6 @@ interface ApiUrlMapper {
 
     @PUT("/api/profile")
     suspend fun updateProfile(@Body request: ProfileUpdateRequestDto): Response<Unit>
-
-    @PUT("/api/profile/doctor-details")
-    suspend fun updateDoctorDetails(@Body details: DoctorDetailsDto): Response<Unit>
-
-    @POST("/api/profile/availability")
-    suspend fun updateAvailability(@Body availability: Map<String, List<TimeSlotDto>>): Response<Unit>
 
     @GET("/api/appointments")
     suspend fun getAppointments(): List<AppointmentDto>

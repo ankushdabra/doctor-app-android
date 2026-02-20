@@ -63,32 +63,6 @@ class AuthenticationRepository(private val tokenManager: TokenManager) {
         }
     }
 
-    suspend fun updateDoctorDetails(details: DoctorDetailsDto): Result<Unit> {
-        return try {
-            val response = api.updateDoctorDetails(details)
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Failed to update doctor details"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun updateAvailability(availability: Map<String, List<TimeSlotDto>>): Result<Unit> {
-        return try {
-            val response = api.updateAvailability(availability)
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Failed to update availability"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     suspend fun logout(): Result<Unit> {
         return try {
             val response = api.logout()
