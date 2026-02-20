@@ -253,18 +253,15 @@ fun ProfileContent(
     // Unified states for professional info & availability
     // Sanitize availability to remove invalid keys like 'additionalProp1'
     var availability by remember(user.doctorDetails?.availability) {
-        mutableStateOf<Map<String, List<TimeSlotDto>>>(
-            user.doctorDetails?.availability?.filterKeys { it in validDayKeys } ?: emptyMap()
-        )
+        val initialMap = user.doctorDetails?.availability?.filterKeys { it in validDayKeys } ?: emptyMap()
+        mutableStateOf<Map<String, List<TimeSlotDto>>>(initialMap)
     }
     
     var specialization by remember(details) { mutableStateOf(details?.specialization ?: "") }
     var qualification by remember(details) { mutableStateOf(details?.qualification ?: "") }
     var experience by remember(details) { mutableStateOf(details?.experience?.toString() ?: "0") }
     var consultationFee by remember(details) {
-        mutableStateOf(
-            details?.consultationFee?.toString() ?: "0.0"
-        )
+        mutableStateOf(details?.consultationFee?.toString() ?: "0.0")
     }
     var clinicAddress by remember(details) { mutableStateOf(details?.clinicAddress ?: "") }
     var about by remember(details) { mutableStateOf(details?.about ?: "") }
